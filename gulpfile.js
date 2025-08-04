@@ -84,6 +84,7 @@ function copy() {
       '!src/test-svgs/!(car-lite.svg)',
       '!src/imgs/maskable.svg',
       'src/*.json',
+      'src/ads.txt',
     ])
     .pipe(gulp.dest('build'));
 }
