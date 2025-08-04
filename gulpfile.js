@@ -113,7 +113,7 @@ async function html() {
         SVGOMG_VERSION: changelog[0].version,
         SVGO_VERSION,
         liveBaseUrl: 'https://jakearchibald.github.io/svgomg/',
-        title: `SVGOMG - SVGO's Missing GUI`,
+        title: `SVGOMG - Optimize and minify SVG images`,
         description: 'Easy & visual compression of SVG images.',
         iconPath: 'imgs/icon.png',
       }),
