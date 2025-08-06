@@ -3,12 +3,19 @@
   <head>
     <!-- Google Analytics tag (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QNC9E0HGPE"></script>
+    <script src="https://cmp.gatekeeperconsent.com/min.js" data-cfasync="false"></script>
+    <script src="https://the.gatekeeperconsent.com/cmp.min.js" data-cfasync="false"></script>    
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-QNC9E0HGPE');
-    </script>    
+    </script>
+    <script async src="//www.ezojs.com/ezoic/sa.min.js"></script>
+    <script>
+        window.ezstandalone = window.ezstandalone || {};
+        ezstandalone.cmd = ezstandalone.cmd || [];
+    </script>     
     <meta charset="utf-8">
     <title>{{ title }}</title>
     <meta name="theme-color" content="#303f9f">
@@ -46,7 +53,6 @@
     <script src="js/page.js" defer></script>
     <style>{{headCSS|safe}}</style>
     <link rel="preload" as="style" href="all.css" onload="rel='stylesheet'">
-    <script type="text/javascript" async="async" data-noptimize="1" data-cfasync="false" src="//scripts.scriptwrapper.com/tags/2c461a95-b411-46fc-a6e5-dd2367e0257a.js"></script>
   </head>
   <body>
     <div class="app-output">
