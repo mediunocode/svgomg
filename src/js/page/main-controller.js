@@ -65,15 +65,24 @@ export default class MainController {
     this._userHasInteracted = false;
     this._reloading = false;
 
+    // Service worker disabled to prevent caching
+    // Unregister any existing service workers
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('sw.js', { scope: './' })
-        .then((registration) => {
-          registration.addEventListener('updatefound', () =>
-            this._onUpdateFound(registration),
-          );
-        });
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
     }
+    // if ('serviceWorker' in navigator) {
+    //   navigator.serviceWorker
+    //     .register('sw.js', { scope: './' })
+    //     .then((registration) => {
+    //       registration.addEventListener('updatefound', () =>
+    //         this._onUpdateFound(registration),
+    //       );
+    //     });
+    // }
 
     // tell the user about the latest update
     storage.get('last-seen-version').then((lastSeenVersion) => {
