@@ -1,4 +1,5 @@
-import { optimize } from 'svgo/dist/svgo.browser.js';
+// eslint-disable-next-line n/file-extension-in-import
+import { optimize } from 'svgo/browser';
 
 const createDimensionsExtractor = () => {
   const dimensions = {};
