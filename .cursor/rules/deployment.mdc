@@ -20,7 +20,7 @@ Because the SPA used to ship cache-busting `<meta>` tags that we removed in T1, 
   - `/ads.txt` → very short cache (e.g. `max-age=300`) so Mediavine config changes propagate fast.
   - `/` and other HTML → short cache (e.g. `max-age=60, stale-while-revalidate=86400`) so Mediavine script-tag changes propagate.
   - `/*.js`, `/*.css`, `/fonts/*`, `/imgs/*` → long cache (`max-age=31536000, immutable`) once content-hashed filenames are in place; until then, `max-age=3600`.
-- Redirects (e.g. future `/learn/...` slugs, locale routes) go in a `_redirects` file in the build output.
+- Redirects (e.g. future `/plugins/...` slugs, locale routes) go in a `_redirects` file in the build output.
 
 ## Cloudflare-specific gotchas
 

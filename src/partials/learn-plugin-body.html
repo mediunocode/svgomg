@@ -2,7 +2,7 @@
       <p class="learn-page-breadcrumb">
         <a href="/">SVGOMG</a>
         <span aria-hidden="true"> / </span>
-        <a href="/learn/">SVGO plugins</a>
+        <a href="/plugins/">SVGO plugins</a>
       </p>
       <h1>{{ plugin.name }} <span class="learn-page-plugin-id">(<code>{{ plugin.id }}</code>)</span></h1>
       <p class="learn-page-lead">
@@ -72,7 +72,7 @@
         <li>Toggle the plugin and compare the preview; download when satisfied.</li>
       </ol>
       <p>
-        <a class="learn-page-cta" href="/">Open SVGOMG optimizer</a>
+        <a class="learn-page-cta" href="/">Open SVGOMG</a>
       </p>
     </section>
 
@@ -81,16 +81,16 @@
         <h2>Related SVGO plugins</h2>
         <ul>
           {% for related in relatedPlugins %}
-            <li><a href="/learn/{{ related.id }}/">{{ related.name }}</a> (<code>{{ related.id }}</code>)</li>
+            <li><a href="/plugins/{{ related.slug }}/">{{ related.name }}</a> (<code>{{ related.id }}</code>)</li>
           {% endfor %}
         </ul>
       </section>
     {% endif %}
 
     <section>
-      <h2>More guides</h2>
+      <h2>SVGO Plugin Guide</h2>
       <p>
-        Browse all <a href="/learn/">SVGO plugin guides</a> or read the
+        Browse the <a href="/plugins/">SVGO Plugin Guide</a> or read the
         <a href="/#how-to-optimize">full SVG optimization walkthrough</a> on the homepage.
       </p>
     </section>

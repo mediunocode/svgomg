@@ -78,7 +78,7 @@
         {% for plugin in plugins %}
           {% if loop.index0 < 12 %}
             <li>
-              <a href="/learn/{{ plugin.id }}/"><strong>{{ plugin.name }}</strong></a>
+              <a href="/plugins/{{ plugin.slug }}/"><strong>{{ plugin.name }}</strong></a>
               (<code>{{ plugin.id }}</code>)
             </li>
           {% endif %}
@@ -120,19 +120,19 @@
     </section>
 
     <section>
-      <h3>SVGO plugin guides</h3>
+      <h3>SVGO Plugin Guide</h3>
       <p>
         Every feature toggle in SVGOMG maps to an SVGO plugin. We publish a
         dedicated guide for each one with enable/disable advice and troubleshooting:
       </p>
       <ul>
-        <li><a href="/learn/removeViewBox/">Remove viewBox</a></li>
-        <li><a href="/learn/cleanupIds/">Clean up IDs</a></li>
-        <li><a href="/learn/convertPathData/">Round/rewrite paths</a></li>
-        <li><a href="/learn/removeMetadata/">Remove &lt;metadata&gt;</a></li>
-        <li><a href="/learn/mergePaths/">Merge paths</a></li>
+        <li><a href="/plugins/remove-view-box/">Remove viewBox</a></li>
+        <li><a href="/plugins/cleanup-ids/">Clean up IDs</a></li>
+        <li><a href="/plugins/convert-path-data/">Round/rewrite paths</a></li>
+        <li><a href="/plugins/remove-metadata/">Remove &lt;metadata&gt;</a></li>
+        <li><a href="/plugins/merge-paths/">Merge paths</a></li>
       </ul>
-      <p><a href="/learn/">Browse all {{ plugins | length }} SVGO plugin guides</a></p>
+      <p><a href="/plugins/">Browse the SVGO Plugin Guide</a> ({{ plugins | length }} plugins)</p>
     </section>
 
     <section class="learn-more-faq">

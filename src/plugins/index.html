@@ -19,7 +19,7 @@
     {
       "@context": "https://schema.org",
       "@type": "CollectionPage",
-      "name": "SVGO plugin guides",
+      "name": "SVGO Plugin Guide",
       "description": "{{ metaDescription|e }}",
       "image": "{{ ogImageUrl|e }}",
       "url": "{{ canonicalUrl|e }}"
@@ -34,7 +34,7 @@
           <p class="learn-page-breadcrumb">
             <a href="/">SVGOMG</a>
           </p>
-          <h1>SVGO plugin guides</h1>
+          <h1>SVGO Plugin Guide</h1>
           <p class="learn-page-lead">
             Long-form reference for every SVGO plugin exposed in
             <a href="/">SVGOMG</a>. Each page explains what the transform does, when to enable it,
@@ -47,7 +47,7 @@
           <ul class="learn-page-plugin-list">
             {% for plugin in featuredPlugins %}
               <li>
-                <a href="/learn/{{ plugin.id }}/"><strong>{{ plugin.name }}</strong></a>
+                <a href="/plugins/{{ plugin.slug }}/"><strong>{{ plugin.name }}</strong></a>
                 <span class="learn-page-plugin-id"><code>{{ plugin.id }}</code></span>
               </li>
             {% endfor %}
@@ -59,7 +59,7 @@
           <ul class="learn-page-plugin-list learn-page-plugin-list-compact">
             {% for plugin in plugins %}
               <li>
-                <a href="/learn/{{ plugin.id }}/">{{ plugin.name }}</a>
+                <a href="/plugins/{{ plugin.slug }}/">{{ plugin.name }}</a>
                 <code>{{ plugin.id }}</code>
               </li>
             {% endfor %}
@@ -68,7 +68,7 @@
 
         <section>
           <p>
-            <a class="learn-page-cta" href="/">Open SVGOMG optimizer</a>
+            <a class="learn-page-cta" href="/">Open SVGOMG</a>
             ·
             <a href="/#how-to-optimize">Optimization walkthrough</a>
           </p>

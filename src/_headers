@@ -21,7 +21,7 @@
 /index.html
   Cache-Control: public, max-age=60, stale-while-revalidate=86400
 
-/learn/*
+/plugins/*
   Cache-Control: public, max-age=60, stale-while-revalidate=86400
 
 /sitemap.xml

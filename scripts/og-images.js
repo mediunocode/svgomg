@@ -27,7 +27,7 @@ const buildOgSvg = ({ name, id }) => {
   )}">
   <rect width="1200" height="630" fill="#303f9f"/>
   <rect y="500" width="1200" height="130" fill="#1a237e"/>
-  <text x="60" y="110" fill="#00bcd4" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="30" font-weight="600">SVGOMG · SVGO plugin guide</text>
+  <text x="60" y="110" fill="#00bcd4" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="30" font-weight="600">SVGOMG · SVGO Plugin Guide</text>
   <text x="60" y="${titleY}" fill="#ffffff" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="${titleSize}" font-weight="600">${escapeXml(
     name,
   )}</text>

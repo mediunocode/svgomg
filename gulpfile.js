@@ -93,7 +93,8 @@ const resolveRelatedPlugins = (pluginId, plugins, learnContent) => {
 
   return entry.related
     .map((id) => plugins.find((p) => p.id === id))
-    .filter(Boolean);
+    .filter(Boolean)
+    .map(withPluginSlug);
 };
 
 const buildPluginPageMeta = (plugin) => {
@@ -106,6 +107,7 @@ const buildOgImageUrl = (liveBaseUrl, slug) =>
   `${liveBaseUrl}imgs/og/${slug}.png`;
 
 const { buildOgSvg } = require('./scripts/og-images.js');
+const { pluginSlug, withPluginSlug } = require('./scripts/plugin-slug.js');
 
 async function ogImages() {
   const { config } = await loadSiteContext();
@@ -122,7 +124,7 @@ async function ogImages() {
   }
 
   const targets = [
-    { id: 'index', name: 'SVGO Plugin Guides' },
+    { id: 'index', name: 'SVGO Plugin Guide' },
     ...config.plugins.map((plugin) => ({
       id: plugin.id,
       name: plugin.name,
@@ -132,9 +134,10 @@ async function ogImages() {
   await Promise.all(
     targets.map(async (target) => {
       const svg = buildOgSvg(target);
+      const fileSlug = target.id === 'index' ? 'index' : pluginSlug(target.id);
       await sharp(Buffer.from(svg))
         .png()
-        .toFile(path.join(outDir, `${target.id}.png`));
+        .toFile(path.join(outDir, `${fileSlug}.png`));
     }),
   );
 }
@@ -195,7 +198,7 @@ async function html() {
     .src('src/*.html')
     .pipe(
       gulpNunjucks.compile({
-        plugins: siteContext.config.plugins,
+        plugins: siteContext.config.plugins.map(withPluginSlug),
         headCSS,
         SVGOMG_VERSION: siteContext.SVGOMG_VERSION,
         SVGO_VERSION: siteContext.SVGO_VERSION,
@@ -219,21 +222,22 @@ async function learnHtmlWrite() {
     autoescape: true,
   });
 
+  const plugins = config.plugins.map(withPluginSlug);
   const featuredPlugins = FEATURED_PLUGIN_IDS.map((id) =>
-    config.plugins.find((p) => p.id === id),
+    plugins.find((p) => p.id === id),
   ).filter(Boolean);
 
   await Promise.all(
-    config.plugins.map(async (plugin) => {
+    plugins.map(async (plugin) => {
       const learn = learnContent[plugin.id] || null;
       const { pageTitle, metaDescription } = buildPluginPageMeta(plugin);
-      const canonicalUrl = `${liveBaseUrl}learn/${plugin.id}/`;
-      const htmlContent = env.render('learn/plugin.html', {
+      const canonicalUrl = `${liveBaseUrl}plugins/${plugin.slug}/`;
+      const htmlContent = env.render('plugins/plugin.html', {
         plugin,
         learn,
         relatedPlugins: resolveRelatedPlugins(
           plugin.id,
-          config.plugins,
+          plugins,
           learnContent,
         ),
         pageTitle,
@@ -241,35 +245,35 @@ async function learnHtmlWrite() {
         canonicalUrl,
         liveBaseUrl,
         iconPath,
-        ogImageUrl: buildOgImageUrl(liveBaseUrl, plugin.id),
+        ogImageUrl: buildOgImageUrl(liveBaseUrl, plugin.slug),
       });
-      const outDir = path.join(__dirname, 'build', 'learn', plugin.id);
+      const outDir = path.join(__dirname, 'build', 'plugins', plugin.slug);
       await fs.mkdir(outDir, { recursive: true });
       await fs.writeFile(path.join(outDir, 'index.html'), htmlContent);
     }),
   );
 
-  const learnIndexHtml = env.render('learn/index.html', {
-    plugins: config.plugins,
+  const learnIndexHtml = env.render('plugins/index.html', {
+    plugins,
     featuredPlugins,
-    pageTitle: 'SVGO Plugin Guides – SVGOMG',
+    pageTitle: 'SVGO Plugin Guide – SVGOMG',
     metaDescription:
-      'Guides for every SVGO plugin in SVGOMG: what each transform does, when to enable it, and how to avoid broken SVG output.',
-    canonicalUrl: `${liveBaseUrl}learn/`,
+      'The SVGO Plugin Guide for SVGOMG: what each transform does, when to enable it, and how to avoid broken SVG output.',
+    canonicalUrl: `${liveBaseUrl}plugins/`,
     liveBaseUrl,
     iconPath,
     ogImageUrl: buildOgImageUrl(liveBaseUrl, 'index'),
   });
-  await fs.mkdir(path.join(__dirname, 'build', 'learn'), { recursive: true });
+  await fs.mkdir(path.join(__dirname, 'build', 'plugins'), { recursive: true });
   await fs.writeFile(
-    path.join(__dirname, 'build', 'learn', 'index.html'),
+    path.join(__dirname, 'build', 'plugins', 'index.html'),
     learnIndexHtml,
   );
 }
 
 function learnHtmlMinify() {
   return gulp
-    .src(['build/learn/**/*.html'], { base: 'build', allowEmpty: true })
+    .src(['build/plugins/**/*.html'], { base: 'build', allowEmpty: true })
     .pipe(gulpif(!IS_DEV_TASK, gulpHtmlmin(buildConfig.htmlmin)))
     .pipe(gulp.dest('build'));
 }
@@ -280,8 +284,8 @@ async function sitemap() {
   const { config, liveBaseUrl } = await loadSiteContext();
   const urls = [
     liveBaseUrl,
-    `${liveBaseUrl}learn/`,
-    ...config.plugins.map((p) => `${liveBaseUrl}learn/${p.id}/`),
+    `${liveBaseUrl}plugins/`,
+    ...config.plugins.map((p) => `${liveBaseUrl}plugins/${pluginSlug(p.id)}/`),
   ];
   const lastmod = new Date().toISOString().slice(0, 10);
   const body = urls
@@ -371,7 +375,7 @@ function watch() {
     [
       'src/**/*.{html,svg,woff2}',
       'src/*.json',
-      'src/learn/**/*.html',
+      'src/plugins/**/*.html',
       'src/partials/**/*.html',
     ],
     gulp.parallel(html, learnPages, copy, allJs),
