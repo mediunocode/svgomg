@@ -85,6 +85,7 @@ function copy() {
       '!src/imgs/maskable.svg',
       'src/*.json',
       'src/ads.txt',
+      'src/_headers',
     ])
     .pipe(gulp.dest('build'));
 }

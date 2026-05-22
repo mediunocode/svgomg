@@ -1,0 +1,40 @@
+# Cloudflare Pages headers.
+# Docs: https://developers.cloudflare.com/pages/configuration/headers/
+
+# ads.txt: short TTL so Mediavine bidder-config changes propagate fast.
+# Stale ads.txt silently disables real-time bidders, costing revenue.
+/ads.txt
+  Cache-Control: public, max-age=300, must-revalidate
+
+# The service worker controls all client-side caching - never cache it long.
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# HTML: short browser cache + long stale-while-revalidate so a new
+# Mediavine script-tag URL is never pinned at the edge for hours, but
+# repeat visits still feel instant.
+/
+  Cache-Control: public, max-age=60, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/index.html
+  Cache-Control: public, max-age=60, stale-while-revalidate=86400
+
+# JSON metadata refreshed at build time.
+/manifest.json
+  Cache-Control: public, max-age=3600
+
+/changelog.json
+  Cache-Control: public, max-age=300
+
+# Static asset folders. Filenames are not content-hashed yet, so we keep
+# this moderate; switch to max-age=31536000, immutable once hashing lands.
+/fonts/*
+  Cache-Control: public, max-age=2592000
+
+/imgs/*
+  Cache-Control: public, max-age=2592000
+
+/.well-known/*
+  Cache-Control: public, max-age=3600
