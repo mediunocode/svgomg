@@ -128,10 +128,3 @@
 .learn-more-faq dl dt {
   color: #212121;
 }
-
-// Mediavine Journey injects in-content units into these placeholders.
-/* stylelint-disable-next-line selector-class-pattern -- Mediavine API class name */
-.content_hint {
-  min-height: 250px;
-  margin: 1.5rem 0;
-}
