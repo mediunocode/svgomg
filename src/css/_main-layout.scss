@@ -1,5 +1,7 @@
 .app-output {
-  height: 100%;
+  position: relative;
+  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-flow: column;

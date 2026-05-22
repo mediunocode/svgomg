@@ -1,0 +1,142 @@
+<section class="learn-more" aria-labelledby="learn-more-heading">
+  <div class="learn-more-inner">
+    <header class="learn-more-header">
+      <h2 id="learn-more-heading">How to optimize SVG files online</h2>
+      <p>
+        SVGOMG is a free browser-based GUI for
+        <a href="https://github.com/svg/svgo">SVGO</a>, the industry-standard SVG
+        optimizer. Upload an SVG, tune the settings on the right, and download a
+        smaller file — usually in seconds, with no server upload required.
+      </p>
+    </header>
+
+    <section>
+      <h3>Why optimize SVG images?</h3>
+      <p>
+        SVGs are XML markup. Exports from design tools often include editor
+        metadata, redundant attributes, over-precise path coordinates, unused
+        definitions, and comments. None of that helps the browser render the
+        graphic, but all of it adds bytes.
+      </p>
+      <p>
+        Smaller SVGs mean faster page loads, better Core Web Vitals, and lower
+        bandwidth — especially on icon sets, logos, and illustrations shipped
+        inline in HTML or CSS. A typical icon can shrink 30–70% without any
+        visible change.
+      </p>
+    </section>
+
+    <section>
+      <h3>Quick start</h3>
+      <ol>
+        <li>Open the menu and choose <strong>Open SVG</strong>, paste markup, or try the demo.</li>
+        <li>Compare the optimized preview against the original (toggle <strong>Show original</strong>).</li>
+        <li>Adjust precision sliders if you need tighter or looser path rounding.</li>
+        <li>Download the result or copy the markup from the Markup tab.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h3>Global settings explained</h3>
+      <dl>
+        <dt>Compare gzipped</dt>
+        <dd>
+          Shows gzip-compressed size alongside raw bytes. Useful when SVGs are
+          served with compression — the number users actually download.
+        </dd>
+        <dt>Prettify markup</dt>
+        <dd>
+          Formats output with indentation. Helpful for debugging; turn off for
+          smallest file size in production.
+        </dd>
+        <dt>Multipass</dt>
+        <dd>
+          Runs SVGO multiple times until no further savings are found. Slightly
+          slower, sometimes meaningfully smaller output.
+        </dd>
+        <dt>Number / transform precision</dt>
+        <dd>
+          Controls how aggressively coordinates and transforms are rounded. Lower
+          values = smaller files; too low can visibly distort complex paths.
+        </dd>
+      </dl>
+    </section>
+
+    <section>
+      <h3>Popular SVGO features</h3>
+      <p>
+        Each toggle in the Features panel maps to an SVGO plugin. Defaults are
+        safe for most icons and illustrations. A few worth understanding:
+      </p>
+      <ul>
+        {% for plugin in plugins %}
+          {% if loop.index0 < 12 %}
+            <li><strong>{{ plugin.name }}</strong> (<code>{{ plugin.id }}</code>)</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+      <p>
+        Plugins like <strong>Remove viewBox</strong> and
+        <strong>Remove raster images</strong> can break responsive or mixed
+        SVG/PNG assets — disable them when output looks wrong, then re-enable
+        one at a time to find the culprit.
+      </p>
+    </section>
+
+    <section>
+      <h3>When optimization breaks your SVG</h3>
+      <p>
+        SVGO is aggressive by design. Common gotchas: animations that rely on
+        specific IDs, CSS that targets removed classes, SVGs that depend on
+        <code>viewBox</code> for scaling, and filters or masks referenced by
+        cleaned-up <code>&lt;defs&gt;</code> sections.
+      </p>
+      <p>
+        If something looks off, enable <strong>Show original</strong>, then
+        disable plugins in groups (metadata cleanup, path rounding, ID cleanup)
+        until the preview matches again. The last group you disabled contains
+        the plugin that caused the regression.
+      </p>
+    </section>
+
+    <section>
+      <h3>SVG vs PNG vs WebP for icons</h3>
+      <p>
+        Use SVG for logos, UI icons, and simple illustrations that must stay
+        sharp at any size. Use PNG or WebP for photos and complex raster art.
+        For multi-color icons at a fixed size, a well-optimized PNG can
+        sometimes beat SVG on bytes — but SVG wins for themeable, accessible,
+        CSS-stylable graphics.
+      </p>
+    </section>
+
+    <section class="learn-more-faq">
+      <h3>Frequently asked questions</h3>
+      <dl>
+        <dt>Is my SVG uploaded to a server?</dt>
+        <dd>
+          No. Optimization runs entirely in your browser via a Web Worker. Your
+          files never leave your device.
+        </dd>
+        <dt>Can I use the output commercially?</dt>
+        <dd>
+          SVGOMG does not change licensing of your artwork. Optimized output is
+          still your SVG — check your source asset license as usual.
+        </dd>
+        <dt>What is SVGO?</dt>
+        <dd>
+          <a href="https://github.com/svg/svgo">SVGO</a> (SVG Optimizer) is an
+          open-source Node.js library that applies dozens of structural and
+          syntactic transforms to shrink SVG files. SVGOMG exposes those options
+          visually.
+        </dd>
+        <dt>How much smaller will my file get?</dt>
+        <dd>
+          It depends on the source. Illustrator, Figma, and Sketch exports with
+          lots of metadata often shrink dramatically. Already-minified SVGs from
+          a previous SVGO pass may only improve a few percent.
+        </dd>
+      </dl>
+    </section>
+  </div>
+</section>

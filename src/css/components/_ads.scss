@@ -1,9 +1,5 @@
-// Reservations for Mediavine Journey ad units.
-//
-// The SPA shell uses `body { overflow: hidden; height: 100% }` and
-// `.app-output { height: 100% }`, so position:fixed ad units overlay the
-// bottom of the UI. We reserve space upfront so injected ads don't cause
-// CLS regressions and don't cover settings/output controls.
+// The tool shell is a fixed 100vh viewport; adhesion banners overlay its
+// bottom edge. Reserve space so injected ads don't cause CLS or cover controls.
 
 :root {
   --mv-adhesion-height: 0;
