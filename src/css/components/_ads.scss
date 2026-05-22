@@ -1,0 +1,27 @@
+// Reservations for Mediavine Journey ad units.
+//
+// The SPA shell uses `body { overflow: hidden; height: 100% }` and
+// `.app-output { height: 100% }`, so position:fixed ad units overlay the
+// bottom of the UI. We reserve space upfront so injected ads don't cause
+// CLS regressions and don't cover settings/output controls.
+
+:root {
+  --mv-adhesion-height: 0;
+}
+
+@media (max-width: 639px) {
+  :root {
+    --mv-adhesion-height: 90px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  :root {
+    --mv-adhesion-height: 50px;
+  }
+}
+
+.app-output {
+  padding-bottom: var(--mv-adhesion-height);
+  box-sizing: border-box;
+}

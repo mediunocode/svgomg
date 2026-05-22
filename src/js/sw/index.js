@@ -74,17 +74,52 @@ async function handleFontRequest(request) {
   return response;
 }
 
+async function handleNavigate(request) {
+  const cache = await caches.open(staticCacheName);
+  const cached =
+    (await cache.match(request, { ignoreSearch: true })) ||
+    (await cache.match('./'));
+
+  const networkPromise = fetch(request)
+    .then(async (response) => {
+      if (response && response.ok) {
+        await cache.put('./', response.clone());
+      }
+
+      return response;
+    })
+    .catch(() => null);
+
+  return cached || (await networkPromise) || Response.error();
+}
+
 addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  const request = event.request;
+
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+
+  // Never intercept cross-origin requests (Mediavine, GA, Plausible, etc.).
+  if (url.origin !== location.origin) return;
+
+  // Always go to network for ads.txt so bidder configuration stays fresh.
+  if (url.pathname === '/ads.txt') return;
 
   if (url.pathname.endsWith('.woff2')) {
-    event.respondWith(handleFontRequest(event.request));
+    event.respondWith(handleFontRequest(request));
+    return;
+  }
+
+  // Stale-while-revalidate for navigations so Mediavine script-tag changes
+  // propagate within a single repeat visit instead of waiting for a SW
+  // version bump.
+  if (request.mode === 'navigate') {
+    event.respondWith(handleNavigate(request));
     return;
   }
 
   event.respondWith(
-    caches
-      .match(event.request)
-      .then((response) => response || fetch(event.request)),
+    caches.match(request).then((response) => response || fetch(request)),
   );
 });

@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://scripts.scriptwrapper.com" crossorigin>
+    <link rel="dns-prefetch" href="//scripts.scriptwrapper.com">
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://plausible.io" crossorigin>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-q9uRWx0xik7G0NvAhQ_sK.js"></script>
     <script>
@@ -15,14 +20,9 @@
         gtag('js', new Date());
         gtag('config', 'G-QNC9E0HGPE');
     </script>
-    <meta charset="utf-8">
     <title>{{ title }}</title>
     <meta name="theme-color" content="#303f9f">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Cache-busting meta tags to prevent browser caching -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <link rel="preload" crossorigin as="font" href="fonts/code-latin.woff2">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="{{ iconPath }}">
@@ -40,21 +40,8 @@
         location.protocol = 'https:';
       }
 
-      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-      ga('create', 'UA-58850134-1', 'auto');
-      ga('send', 'pageview');
-
       window.version = '{{SVGOMG_VERSION}}';
 
-      // Delay analytics until after the page has loaded, to avoid extending
-      // the browser spinner, and allow higher priority stuff through.
-      addEventListener('load', function() {
-        var script = document.createElement('script');
-        script.src = 'https://www.google-analytics.com/analytics.js';
-        document.head.appendChild(script);
-      });
-
-      // Avoid ad/measurement integrations on local development hosts.
       if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
         var adScript = document.createElement('script');
         adScript.type = 'text/javascript';
@@ -211,8 +198,7 @@
       </div>
       <script>
         document.querySelector('.preloader').addEventListener('click', function() {
-          // track it
-          ga('send', 'event', 'preloader', 'clicked');
+          if (typeof gtag === 'function') gtag('event', 'preloader_click');
           this.className = 'preloader active';
         });
       </script>

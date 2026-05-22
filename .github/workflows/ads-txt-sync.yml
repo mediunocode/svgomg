@@ -1,0 +1,59 @@
+name: Sync ads.txt
+
+# Pulls the latest ads.txt from Mediavine and commits it if changed.
+# Stale ads.txt silently disables bidders, costing real revenue, so we
+# refresh weekly. Configure the source URL once as a repository variable
+# named ADS_TXT_URL (Settings -> Secrets and variables -> Actions ->
+# Variables). Get the URL from the Journey dashboard under Ad Setup /
+# ads.txt manager.
+
+on:
+  schedule:
+    # Mondays at 06:00 UTC.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Refresh ads.txt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download latest ads.txt
+        env:
+          ADS_TXT_URL: ${{ vars.ADS_TXT_URL }}
+        run: |
+          if [ -z "$ADS_TXT_URL" ]; then
+            echo "::error::ADS_TXT_URL repository variable is not set. Set it to the Mediavine ads.txt URL from the Journey dashboard."
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --location \
+            --user-agent "svgomg-ads-txt-sync" \
+            "$ADS_TXT_URL" -o src/ads.txt.new
+
+          # Sanity check: must contain the Journey publisher tag.
+          if ! grep -q "2c461a95-b411-46fc-a6e5-dd2367e0257a" src/ads.txt.new; then
+            echo "::error::Downloaded ads.txt does not contain the expected Journey publisher tag. Aborting to avoid wiping a valid file."
+            exit 1
+          fi
+
+          mv src/ads.txt.new src/ads.txt
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet src/ads.txt; then
+            echo "ads.txt unchanged"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/ads.txt
+          git commit -m "chore(ads): sync ads.txt from Mediavine $(date -u +%Y-%m-%d)"
+          git push
