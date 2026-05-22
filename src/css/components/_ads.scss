@@ -2,7 +2,7 @@
 // bottom edge. Reserve space so injected ads don't cause CLS or cover controls.
 
 :root {
-  --mv-adhesion-height: 0;
+  --mv-adhesion-height: 0px;
 }
 
 @media (max-width: 639px) {

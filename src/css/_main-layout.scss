@@ -38,12 +38,13 @@
 .output {
   flex: 1 1 0;
   position: relative;
+  overflow: hidden;
 }
 
 .action-button-container {
   position: absolute;
   z-index: 2;
-  bottom: -28px;
+  bottom: calc(-28px + var(--mv-adhesion-height));
   right: 13px;
   display: flex;
   align-items: center;
@@ -58,7 +59,7 @@
 
   @media (min-width: 640px) {
     right: 30px;
-    bottom: 150px;
+    bottom: calc(30px + var(--mv-adhesion-height));
 
     .results-container {
       margin-right: -17px;
@@ -79,7 +80,6 @@
 
   @media (min-width: 900px) {
     right: 0;
-    bottom: 150px;
   }
 
 }
@@ -136,10 +136,13 @@
 }
 
 .action-button-container {
-  transform: translateX(168px);
+  // Off-screen until an SVG loads. Horizontal hide on mobile; vertical on desktop.
+  // Hide distance includes --mv-adhesion-height so the slide-in ends at the
+  // ad-cleared resting position (bottom calc above).
+  transform: translateX(calc(100% + 32px));
 
   @media (min-width: 640px) {
-    transform: translateY(188px);
+    transform: translateY(calc(188px + var(--mv-adhesion-height)));
   }
 
   &.transition {
@@ -151,7 +154,7 @@
   }
 
   &.active {
-    transform: translateZ(0);
+    transform: none;
   }
 }
 

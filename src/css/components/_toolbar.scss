@@ -5,6 +5,18 @@
   align-items: center;
 }
 
+.toolbar-tabs {
+  flex: 1;
+  min-width: 0;
+
+  .material-tab {
+    @media (max-width: 639px) {
+      padding: 0 14px;
+      font-size: 0.8rem;
+    }
+  }
+}
+
 .menu-toolbar-item {
   button {
     padding: 10px 12px;

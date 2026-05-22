@@ -17,6 +17,28 @@
   }
 }
 
+.view-toggler {
+  display: flex;
+  align-self: stretch;
+}
+
+.material-tab-link {
+  &:link,
+  &:visited {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &:hover .selected,
+  &:focus .selected {
+    background-color: transparentize(#fff, 0.9);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
 .material-tab {
   display: flex;
   align-items: center;

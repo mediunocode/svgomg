@@ -21,6 +21,16 @@ export default class ViewToggler {
           value: this.container.output.value,
         });
       });
+
+      const guideLink = document.querySelector('.material-tab-link');
+      if (guideLink) {
+        guideLink.addEventListener('click', (event) => {
+          event.preventDefault();
+          const toolHeight = document.querySelector('.app-output').offsetHeight;
+          window.scrollTo({ top: toolHeight, behavior: 'smooth' });
+          history.pushState(null, '', '#how-to-optimize');
+        });
+      }
     });
   }
 }

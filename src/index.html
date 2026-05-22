@@ -107,18 +107,24 @@
             {% include "partials/icons/menu.svg" %}
           </button>
         </div>
-        <form class="material-tabs view-toggler">
-          <label class="material-tab">
-            <input type="radio" name="output" value="image" checked>
+        <div class="toolbar-tabs material-tabs">
+          <form class="view-toggler">
+            <label class="material-tab">
+              <input type="radio" name="output" value="image" checked>
+              <span class="selected"></span>
+              Image
+            </label>
+            <label class="material-tab">
+              <input type="radio" name="output" value="code">
+              <span class="selected"></span>
+              Markup
+            </label>
+          </form>
+          <a class="material-tab material-tab-link" href="#how-to-optimize">
             <span class="selected"></span>
-            Image
-          </label>
-          <label class="material-tab">
-            <input type="radio" name="output" value="code">
-            <span class="selected"></span>
-            Markup
-          </label>
-        </form>
+            How to optimize
+          </a>
+        </div>
       </div>
       <div class="main">
         <div class="output">
