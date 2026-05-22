@@ -1,0 +1,96 @@
+    <header class="learn-page-article-header">
+      <p class="learn-page-breadcrumb">
+        <a href="/">SVGOMG</a>
+        <span aria-hidden="true"> / </span>
+        <a href="/learn/">SVGO plugins</a>
+      </p>
+      <h1>{{ plugin.name }} <span class="learn-page-plugin-id">(<code>{{ plugin.id }}</code>)</span></h1>
+      <p class="learn-page-lead">
+        {% if learn and learn.summary %}
+          {{ learn.summary }}
+        {% else %}
+          The <strong>{{ plugin.name }}</strong> plugin (<code>{{ plugin.id }}</code>) is an SVGO transform
+          you can toggle in <a href="/">SVGOMG</a>. This guide explains what it does, when to enable it,
+          and what can go wrong in production SVGs.
+        {% endif %}
+      </p>
+    </header>
+
+    <section>
+      <h2>What {{ plugin.name }} does in SVGO</h2>
+      <p>
+        SVGO applies <code>{{ plugin.id }}</code> as part of its plugin pipeline. In SVGOMG the toggle
+        is labeled <strong>{{ plugin.name }}</strong>
+        {% if plugin.enabledByDefault %}(enabled by default){% else %}(off by default){% endif %}.
+        Optimization runs entirely in your browser — files are not uploaded to a server.
+      </p>
+      <p>
+        Use the <a href="/">SVGOMG optimizer</a> with <strong>Show original</strong> to compare before
+        and after. If output looks wrong, disable this plugin first, then re-enable related transforms
+        one at a time.
+      </p>
+    </section>
+
+    <section>
+      <h2>When to enable</h2>
+      <p>
+        {% if learn and learn.whenEnable %}
+          {{ learn.whenEnable }}
+        {% else %}
+          Enable <strong>{{ plugin.name }}</strong> for production SVGs when you want smaller files and
+          do not depend on the specific markup this plugin removes or rewrites. It is
+          {% if plugin.enabledByDefault %}on by default because it is safe for typical icons and UI graphics{% else %}off by default because it can change behavior for some assets{% endif %}.
+        {% endif %}
+      </p>
+    </section>
+
+    <section>
+      <h2>When to disable</h2>
+      <p>
+        {% if learn and learn.whenDisable %}
+          {{ learn.whenDisable }}
+        {% else %}
+          Turn off <code>{{ plugin.id }}</code> if the optimized SVG breaks in your layout, animation,
+          or styling. Re-export from your design tool with fewer hidden layers, then try again with a
+          narrower set of plugins.
+        {% endif %}
+      </p>
+    </section>
+
+    {% if learn and learn.caution %}
+      <section>
+        <h2>Watch out for</h2>
+        <p>{{ learn.caution }}</p>
+      </section>
+    {% endif %}
+
+    <section>
+      <h2>Try it in SVGOMG</h2>
+      <ol>
+        <li>Open <a href="/">svgomg.net</a> and load your SVG (file, paste, or demo).</li>
+        <li>Find <strong>{{ plugin.name }}</strong> in the Features panel (<code>{{ plugin.id }}</code>).</li>
+        <li>Toggle the plugin and compare the preview; download when satisfied.</li>
+      </ol>
+      <p>
+        <a class="learn-page-cta" href="/">Open SVGOMG optimizer</a>
+      </p>
+    </section>
+
+    {% if relatedPlugins | length %}
+      <section class="learn-page-related">
+        <h2>Related SVGO plugins</h2>
+        <ul>
+          {% for related in relatedPlugins %}
+            <li><a href="/learn/{{ related.id }}/">{{ related.name }}</a> (<code>{{ related.id }}</code>)</li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <section>
+      <h2>More guides</h2>
+      <p>
+        Browse all <a href="/learn/">SVGO plugin guides</a> or read the
+        <a href="/#how-to-optimize">full SVG optimization walkthrough</a> on the homepage.
+      </p>
+    </section>

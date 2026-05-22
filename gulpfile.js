@@ -1,3 +1,4 @@
+const { Buffer } = require('buffer');
 const fs = require('fs/promises');
 const path = require('path');
 const process = require('process');
@@ -71,6 +72,73 @@ const readJSON = async (filePath) => {
   return JSON.parse(content);
 };
 
+const nunjucks = require('gulp-nunjucks/node_modules/nunjucks');
+
+const FEATURED_PLUGIN_IDS = [
+  'removeViewBox',
+  'cleanupIds',
+  'convertPathData',
+  'removeMetadata',
+  'mergePaths',
+  'removeHiddenElems',
+  'inlineStyles',
+  'removeDimensions',
+];
+
+const resolveRelatedPlugins = (pluginId, plugins, learnContent) => {
+  const entry = learnContent[pluginId];
+  if (!entry?.related) {
+    return [];
+  }
+
+  return entry.related
+    .map((id) => plugins.find((p) => p.id === id))
+    .filter(Boolean);
+};
+
+const buildPluginPageMeta = (plugin) => {
+  const pageTitle = `${plugin.name} – SVGO Plugin Guide | SVGOMG`;
+  const metaDescription = `When to use SVGO ${plugin.id} (${plugin.name}) in SVGOMG. Enable safely, avoid broken SVGs, and optimize in the browser.`;
+  return { pageTitle, metaDescription };
+};
+
+const buildOgImageUrl = (liveBaseUrl, slug) =>
+  `${liveBaseUrl}imgs/og/${slug}.png`;
+
+const { buildOgSvg } = require('./scripts/og-images.js');
+
+async function ogImages() {
+  const { config } = await loadSiteContext();
+  const outDir = path.join(__dirname, 'build', 'imgs', 'og');
+  await fs.mkdir(outDir, { recursive: true });
+
+  let sharp;
+  try {
+    sharp = require('sharp');
+  } catch {
+    throw new Error(
+      'sharp is required to build OG images. Run: npm install --save-dev sharp',
+    );
+  }
+
+  const targets = [
+    { id: 'index', name: 'SVGO Plugin Guides' },
+    ...config.plugins.map((plugin) => ({
+      id: plugin.id,
+      name: plugin.name,
+    })),
+  ];
+
+  await Promise.all(
+    targets.map(async (target) => {
+      const svg = buildOgSvg(target);
+      await sharp(Buffer.from(svg))
+        .png()
+        .toFile(path.join(outDir, `${target.id}.png`));
+    }),
+  );
+}
+
 const minifyCss = vinylMap((buffer) => {
   return new CleanCSS(buildConfig.cleancss).minify(buffer.toString()).styles;
 });
@@ -86,6 +154,7 @@ function copy() {
       'src/*.json',
       'src/ads.txt',
       'src/_headers',
+      'src/robots.txt',
     ])
     .pipe(gulp.dest('build'));
 }
@@ -98,29 +167,131 @@ function css() {
     .pipe(gulp.dest('build/', { sourcemaps: '.' }));
 }
 
-async function html() {
-  const [config, changelog, headCSS] = await Promise.all([
+async function loadSiteContext() {
+  const [config, changelog, site] = await Promise.all([
     readJSON(path.join(__dirname, 'src', 'config.json')),
     readJSON(path.join(__dirname, 'src', 'changelog.json')),
-    fs.readFile(path.join(__dirname, 'build', 'head.css'), 'utf8'),
+    readJSON(path.join(__dirname, 'src', 'site.json')),
   ]);
+
+  return {
+    config,
+    changelog,
+    liveBaseUrl: site.liveBaseUrl,
+    iconPath: 'imgs/icon.png',
+    SVGOMG_VERSION: changelog[0].version,
+    SVGO_VERSION,
+  };
+}
+
+async function html() {
+  const siteContext = await loadSiteContext();
+  const headCSS = await fs.readFile(
+    path.join(__dirname, 'build', 'head.css'),
+    'utf8',
+  );
 
   return gulp
     .src('src/*.html')
     .pipe(
       gulpNunjucks.compile({
-        plugins: config.plugins,
+        plugins: siteContext.config.plugins,
         headCSS,
-        SVGOMG_VERSION: changelog[0].version,
-        SVGO_VERSION,
-        liveBaseUrl: 'https://jakearchibald.github.io/svgomg/',
-        title: `SVGOMG - Optimize and minify SVG images`,
-        description: 'Easy & visual compression of SVG images.',
-        iconPath: 'imgs/icon.png',
+        SVGOMG_VERSION: siteContext.SVGOMG_VERSION,
+        SVGO_VERSION: siteContext.SVGO_VERSION,
+        liveBaseUrl: siteContext.liveBaseUrl,
+        title: 'SVGOMG - Optimize and minify SVG images',
+        description:
+          'Free online SVG optimizer and minifier. Compress SVG images with SVGO in your browser — no upload required.',
+        iconPath: siteContext.iconPath,
       }),
     )
     .pipe(gulpif(!IS_DEV_TASK, gulpHtmlmin(buildConfig.htmlmin)))
     .pipe(gulp.dest('build'));
+}
+
+async function learnHtmlWrite() {
+  const { config, liveBaseUrl, iconPath } = await loadSiteContext();
+  const learnContent = await readJSON(
+    path.join(__dirname, 'src', 'learn-content.json'),
+  );
+  const env = nunjucks.configure(path.join(__dirname, 'src'), {
+    autoescape: true,
+  });
+
+  const featuredPlugins = FEATURED_PLUGIN_IDS.map((id) =>
+    config.plugins.find((p) => p.id === id),
+  ).filter(Boolean);
+
+  await Promise.all(
+    config.plugins.map(async (plugin) => {
+      const learn = learnContent[plugin.id] || null;
+      const { pageTitle, metaDescription } = buildPluginPageMeta(plugin);
+      const canonicalUrl = `${liveBaseUrl}learn/${plugin.id}/`;
+      const htmlContent = env.render('learn/plugin.html', {
+        plugin,
+        learn,
+        relatedPlugins: resolveRelatedPlugins(
+          plugin.id,
+          config.plugins,
+          learnContent,
+        ),
+        pageTitle,
+        metaDescription,
+        canonicalUrl,
+        liveBaseUrl,
+        iconPath,
+        ogImageUrl: buildOgImageUrl(liveBaseUrl, plugin.id),
+      });
+      const outDir = path.join(__dirname, 'build', 'learn', plugin.id);
+      await fs.mkdir(outDir, { recursive: true });
+      await fs.writeFile(path.join(outDir, 'index.html'), htmlContent);
+    }),
+  );
+
+  const learnIndexHtml = env.render('learn/index.html', {
+    plugins: config.plugins,
+    featuredPlugins,
+    pageTitle: 'SVGO Plugin Guides – SVGOMG',
+    metaDescription:
+      'Guides for every SVGO plugin in SVGOMG: what each transform does, when to enable it, and how to avoid broken SVG output.',
+    canonicalUrl: `${liveBaseUrl}learn/`,
+    liveBaseUrl,
+    iconPath,
+    ogImageUrl: buildOgImageUrl(liveBaseUrl, 'index'),
+  });
+  await fs.mkdir(path.join(__dirname, 'build', 'learn'), { recursive: true });
+  await fs.writeFile(
+    path.join(__dirname, 'build', 'learn', 'index.html'),
+    learnIndexHtml,
+  );
+}
+
+function learnHtmlMinify() {
+  return gulp
+    .src(['build/learn/**/*.html'], { base: 'build', allowEmpty: true })
+    .pipe(gulpif(!IS_DEV_TASK, gulpHtmlmin(buildConfig.htmlmin)))
+    .pipe(gulp.dest('build'));
+}
+
+const learnHtml = gulp.series(learnHtmlWrite, learnHtmlMinify);
+
+async function sitemap() {
+  const { config, liveBaseUrl } = await loadSiteContext();
+  const urls = [
+    liveBaseUrl,
+    `${liveBaseUrl}learn/`,
+    ...config.plugins.map((p) => `${liveBaseUrl}learn/${p.id}/`),
+  ];
+  const lastmod = new Date().toISOString().slice(0, 10);
+  const body = urls
+    .map(
+      (loc) =>
+        `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`,
+    )
+    .join('\n');
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+  await fs.writeFile(path.join(__dirname, 'build', 'sitemap.xml'), xml);
 }
 
 const rollupCaches = new Map();
@@ -179,14 +350,31 @@ const allJs = gulp.parallel(
   js.bind(null, 'js/page/index.js', 'js/'),
 );
 
-const mainBuild = gulp.parallel(gulp.series(css, html), allJs, copy);
+const learnPages = gulp.series(
+  ogImages,
+  learnHtmlWrite,
+  learnHtmlMinify,
+  sitemap,
+);
+
+const mainBuild = gulp.parallel(
+  gulp.series(css, html),
+  learnPages,
+  allJs,
+  copy,
+);
 
 function watch() {
   gulp.watch(['src/css/**/*.scss'], gulp.series(css, html));
   gulp.watch(['src/js/**/*.js'], allJs);
   gulp.watch(
-    ['src/**/*.{html,svg,woff2}', 'src/*.json'],
-    gulp.parallel(html, copy, allJs),
+    [
+      'src/**/*.{html,svg,woff2}',
+      'src/*.json',
+      'src/learn/**/*.html',
+      'src/partials/**/*.html',
+    ],
+    gulp.parallel(html, learnPages, copy, allJs),
   );
 }
 
@@ -203,6 +391,9 @@ exports.clean = clean;
 exports.allJs = allJs;
 exports.css = css;
 exports.html = html;
+exports.ogImages = ogImages;
+exports.learnHtml = learnHtml;
+exports.sitemap = sitemap;
 exports.copy = copy;
 exports.build = mainBuild;
 

@@ -1,0 +1,310 @@
+{
+  "removeDoctype": {
+    "summary": "Removes the <!DOCTYPE svg> declaration. Browsers do not need it for inline SVG and it only adds bytes.",
+    "whenEnable": "Production web assets and icons where the doctype provides no behavior.",
+    "whenDisable": "Workflows that require a full XML document with doctype for validation.",
+    "caution": "None for typical browser rendering.",
+    "related": ["removeXMLProcInst", "removeComments", "removeMetadata"]
+  },
+  "removeXMLProcInst": {
+    "summary": "Strips <?xml version=\"1.0\" encoding=\"UTF-8\"?> and similar processing instructions at the top of the file.",
+    "whenEnable": "Almost all SVGs embedded in HTML or used as img/src or CSS backgrounds.",
+    "whenDisable": "When downstream tools require an XML prolog for parsing.",
+    "caution": "None for browsers.",
+    "related": ["removeDoctype", "removeComments", "removeMetadata"]
+  },
+  "removeComments": {
+    "summary": "Removes XML comments left by editors and hand-authored notes.",
+    "whenEnable": "Always for production unless comments document required licensing in-file.",
+    "whenDisable": "Rare; keep comments only if your pipeline parses them.",
+    "caution": "None.",
+    "related": ["removeMetadata", "removeDoctype", "removeEditorsNSData"]
+  },
+  "removeMetadata": {
+    "summary": "Deletes <metadata> blocks (often license, layer names, or XMP from Adobe tools). Safe byte savings with no visual effect.",
+    "whenEnable": "Shipping icons and UI graphics to production.",
+    "whenDisable": "When you must preserve embedded rights or workflow metadata for compliance.",
+    "caution": "None for most web use cases.",
+    "related": ["removeEditorsNSData", "removeComments", "cleanupIds"]
+  },
+  "removeXMLNS": {
+    "summary": "Removes redundant default xmlns attributes when they can be inferred, shrinking attribute noise.",
+    "whenEnable": "Standalone SVG files embedded where the namespace is implicit.",
+    "whenDisable": "SVGs used as documents, mixed namespaces, or fragments that rely on explicit xmlns.",
+    "caution": "Can break unusual namespace setups; off by default in SVGOMG.",
+    "related": ["removeUnusedNS", "removeEditorsNSData", "cleanupAttrs"]
+  },
+  "removeEditorsNSData": {
+    "summary": "Removes editor-specific namespaced attributes (Adobe, Sketch, Figma cruft) that browsers ignore.",
+    "whenEnable": "Exports from design tools for web delivery.",
+    "whenDisable": "When you round-trip back into the same editor and need proprietary metadata.",
+    "caution": "None for rendering.",
+    "related": ["removeMetadata", "removeHiddenElems", "cleanupAttrs"]
+  },
+  "cleanupAttrs": {
+    "summary": "Trims whitespace in attribute values and normalizes quoting so attributes are minimal.",
+    "whenEnable": "Default for most exports with messy attribute formatting.",
+    "whenDisable": "When whitespace in attribute values is semantically significant (very rare).",
+    "caution": "None.",
+    "related": ["sortAttrs", "removeEmptyAttrs", "removeUnknownsAndDefaults"]
+  },
+  "mergeStyles": {
+    "summary": "Combines multiple <style> elements and merges rules where possible before inlining or minifying.",
+    "whenEnable": "SVGs with several style blocks from layered exports.",
+    "whenDisable": "When separate style blocks must stay isolated for cascade reasons.",
+    "caution": "Run before inlineStyles and minifyStyles.",
+    "related": ["inlineStyles", "minifyStyles", "convertStyleToAttrs"]
+  },
+  "inlineStyles": {
+    "summary": "Moves CSS rules from <style> blocks onto matching elements as attributes.",
+    "whenEnable": "SVGs that use class-based CSS you want flattened for portability.",
+    "whenDisable": "Complex selectors, @media rules, or styles that cannot map 1:1 to attributes.",
+    "caution": "Run after mergeStyles; order matters in SVGO multipass.",
+    "related": ["mergeStyles", "minifyStyles", "convertStyleToAttrs"]
+  },
+  "minifyStyles": {
+    "summary": "Minifies CSS inside <style> elements (whitespace, redundant syntax) before or instead of inlining.",
+    "whenEnable": "SVGs that keep internal stylesheets rather than inlined attributes.",
+    "whenDisable": "When you rely on readable CSS remaining in the file for debugging.",
+    "caution": "Pair with mergeStyles for best results.",
+    "related": ["mergeStyles", "inlineStyles", "removeStyleElement"]
+  },
+  "convertStyleToAttrs": {
+    "summary": "Converts simple CSS declarations on elements into presentational SVG attributes.",
+    "whenEnable": "Flat icons where styles map cleanly to fill, stroke, and opacity attributes.",
+    "whenDisable": "Complex CSS (pseudo-classes, descendant selectors) that cannot become attributes.",
+    "caution": "Off by default; enable only after checking visual parity.",
+    "related": ["inlineStyles", "minifyStyles", "removeStyleElement"]
+  },
+  "cleanupIds": {
+    "summary": "Shortens and deduplicates id attributes and updates url(#…) references. Essential for minifying Illustrator exports that ship long random IDs.",
+    "whenEnable": "Almost always for production assets unless you rely on stable IDs for CSS, JS, or SMIL animation.",
+    "whenDisable": "SVGs with external stylesheets targeting specific IDs, or animations that reference fixed id values you cannot rename.",
+    "caution": "Can break fragment references if plugins run in the wrong order or IDs are referenced from outside the file.",
+    "related": ["removeMetadata", "removeHiddenElems", "mergePaths"]
+  },
+  "removeRasterImages": {
+    "summary": "Deletes embedded PNG/JPEG inside SVG. Shrinks file size but removes bitmap content.",
+    "whenEnable": "Pure vector artwork that accidentally embedded a raster.",
+    "whenDisable": "Any SVG that intentionally mixes vector and bitmap (common in Illustrator).",
+    "caution": "Will leave empty space or broken visuals if the image was essential.",
+    "related": ["removeUselessDefs", "removeHiddenElems", "removeOffCanvasPaths"]
+  },
+  "removeUselessDefs": {
+    "summary": "Removes unreferenced items in <defs> (gradients, symbols, paths) after other cleanup passes.",
+    "whenEnable": "Default; defs bloat is common in design-tool exports.",
+    "whenDisable": "When defs are referenced dynamically at runtime in ways SVGO cannot see.",
+    "caution": "Run after path and ID cleanup for accurate reference tracking.",
+    "related": ["cleanupIds", "removeHiddenElems", "reusePaths"]
+  },
+  "cleanupNumericValues": {
+    "summary": "Rounds numeric attributes (coordinates, opacities) to fewer decimal places.",
+    "whenEnable": "Most web SVGs; tune global number precision in SVGOMG.",
+    "whenDisable": "Scientific plots or maps needing many decimal places.",
+    "caution": "Works with convertPathData; combined rounding can compound.",
+    "related": ["convertPathData", "convertTransform", "cleanupListOfValues"]
+  },
+  "cleanupListOfValues": {
+    "summary": "Rounds numbers inside space-separated lists (points, viewBox, transforms) for smaller attributes.",
+    "whenEnable": "Polygons and polylines with over-precise point lists.",
+    "whenDisable": "When list values must stay at full precision for hit-testing or animation.",
+    "caution": "Off by default; enable with care on data visualizations.",
+    "related": ["cleanupNumericValues", "convertPathData", "convertTransform"]
+  },
+  "convertColors": {
+    "summary": "Converts colors to shorter forms (#RGB, named colors) and merges equivalent values.",
+    "whenEnable": "Most illustrated SVGs using hex or rgb() fills and strokes.",
+    "whenDisable": "When wide-gamut or document-specific color profiles must be preserved exactly.",
+    "caution": "Verify brand colors still match after conversion.",
+    "related": ["removeUselessStrokeAndFill", "minifyStyles", "cleanupNumericValues"]
+  },
+  "removeUnknownsAndDefaults": {
+    "summary": "Drops attributes and elements that match SVG defaults or are unknown to the spec.",
+    "whenEnable": "Safe default for shrinking verbose editor output.",
+    "whenDisable": "When targeting non-standard attributes your runtime depends on.",
+    "caution": "May remove vendor-specific attributes you still need.",
+    "related": ["removeEmptyAttrs", "cleanupAttrs", "removeUselessStrokeAndFill"]
+  },
+  "removeNonInheritableGroupAttrs": {
+    "summary": "Removes presentation attributes on groups that children cannot inherit meaningfully.",
+    "whenEnable": "Deeply nested group structures from Illustrator or Figma.",
+    "whenDisable": "Rare edge cases with unusual group styling you rely on.",
+    "caution": "None for typical icons.",
+    "related": ["collapseGroups", "moveGroupAttrsToElems", "removeUselessStrokeAndFill"]
+  },
+  "removeUselessStrokeAndFill": {
+    "summary": "Removes stroke and fill attributes that do not change rendering (e.g. default black fill).",
+    "whenEnable": "Icons and UI assets with redundant presentation attributes on every path.",
+    "whenDisable": "When inheritance chains are subtle and you see missing colors after optimization.",
+    "caution": "Re-check multicolor icons after enabling.",
+    "related": ["convertColors", "removeUnknownsAndDefaults", "mergePaths"]
+  },
+  "removeViewBox": {
+    "summary": "Strips the viewBox attribute so width and height alone define layout. That often saves bytes but breaks responsive scaling when CSS only sets one dimension.",
+    "whenEnable": "Fixed-size icons and assets that never scale (favicons, pixel-perfect UI sprites).",
+    "whenDisable": "Responsive SVGs, logos in fluid layouts, or anything using CSS max-width with only a viewBox for aspect ratio.",
+    "caution": "After removal, the graphic may render at the wrong size or clip unexpectedly in browsers.",
+    "related": ["removeDimensions", "cleanupIds", "convertPathData"]
+  },
+  "cleanupEnableBackground": {
+    "summary": "Removes or normalizes legacy enable-background attributes from old Illustrator exports.",
+    "whenEnable": "Older SVG assets that still carry enable-background noise.",
+    "whenDisable": "When targeting legacy viewers that still interpret enable-background (uncommon).",
+    "caution": "None for modern browsers.",
+    "related": ["removeMetadata", "removeEditorsNSData", "removeHiddenElems"]
+  },
+  "removeHiddenElems": {
+    "summary": "Removes elements with display:none or zero opacity that editors leave behind.",
+    "whenEnable": "Exports from Figma, Sketch, and Illustrator with hidden layers.",
+    "whenDisable": "If hidden layers are toggled visible by external CSS in your app.",
+    "caution": "May remove layers you intended to toggle via CSS in rare setups.",
+    "related": ["removeEmptyContainers", "removeUselessDefs", "cleanupIds"]
+  },
+  "removeEmptyText": {
+    "summary": "Deletes empty <text> and <tspan> nodes left by design tools.",
+    "whenEnable": "Text-heavy exports that include placeholder text layers.",
+    "whenDisable": "When empty text nodes are placeholders your scripts populate at runtime.",
+    "caution": "None if the SVG has no text.",
+    "related": ["removeHiddenElems", "removeEmptyContainers", "removeTitle"]
+  },
+  "convertShapeToPath": {
+    "summary": "Converts rect, circle, ellipse, and line elements to path equivalents, often smaller after path rounding.",
+    "whenEnable": "Simple shapes in icon sets (default on).",
+    "whenDisable": "When you need native shape elements for animation or semantic reasons.",
+    "caution": "Slightly larger output in rare cases for trivial shapes.",
+    "related": ["convertPathData", "convertEllipseToCircle", "mergePaths"]
+  },
+  "moveElemsAttrsToGroup": {
+    "summary": "Hoists common child attributes up to parent <g> elements to reduce duplication.",
+    "whenEnable": "Icons with many paths sharing fill or stroke.",
+    "whenDisable": "When hoisting would change specificity of presentation inheritance.",
+    "caution": "Visual check recommended on layered artwork.",
+    "related": ["moveGroupAttrsToElems", "collapseGroups", "mergePaths"]
+  },
+  "moveGroupAttrsToElems": {
+    "summary": "Pushes group-level presentation attributes down to children when that yields smaller output.",
+    "whenEnable": "Deep groups with few children where inlining attrs is cheaper.",
+    "whenDisable": "When group-level styling is intentional for later editing.",
+    "caution": "Can increase file size if many children inherit the same long values.",
+    "related": ["moveElemsAttrsToGroup", "collapseGroups", "removeNonInheritableGroupAttrs"]
+  },
+  "collapseGroups": {
+    "summary": "Removes unnecessary wrapper <g> elements that do not affect rendering.",
+    "whenEnable": "Default; flattening groups simplifies the tree and aids other plugins.",
+    "whenDisable": "When group IDs or transforms must remain for scripting.",
+    "caution": "May affect elements targeted by CSS or JS via group structure.",
+    "related": ["moveElemsAttrsToGroup", "removeEmptyContainers", "cleanupIds"]
+  },
+  "convertPathData": {
+    "summary": "Rewrites path commands with fewer digits and simpler curves. Usually one of the largest wins on complex illustrations.",
+    "whenEnable": "Detailed paths from design tools with over-precise coordinates (default in SVGOMG).",
+    "whenDisable": "When sub-pixel accuracy matters for animation paths or geometric CAD-like drawings.",
+    "caution": "Aggressive rounding can visibly change curves on large viewBoxes; lower number precision if you see drift.",
+    "related": ["cleanupNumericValues", "convertTransform", "mergePaths"]
+  },
+  "convertEllipseToCircle": {
+    "summary": "Replaces ellipses with equal radii by <circle> elements, which are more compact.",
+    "whenEnable": "Icons and UI with perfect circles exported as ellipses.",
+    "whenDisable": "Non-circular ellipses that must stay elliptical.",
+    "caution": "Only affects eccentricity-equal ellipses.",
+    "related": ["convertShapeToPath", "convertPathData", "cleanupNumericValues"]
+  },
+  "convertTransform": {
+    "summary": "Optimizes transform attributes: shorter matrix notation, combined operations, fewer decimals.",
+    "whenEnable": "Assets with many transform chains from design tools.",
+    "whenDisable": "Keyframe animations that depend on exact transform strings.",
+    "caution": "Combine with conservative transform precision if motion looks wrong.",
+    "related": ["convertPathData", "cleanupNumericValues", "collapseGroups"]
+  },
+  "removeEmptyAttrs": {
+    "summary": "Deletes attributes with empty values (fill=\"\", style=\"\", etc.).",
+    "whenEnable": "Default cleanup after editor exports.",
+    "whenDisable": "When empty attributes are intentional sentinels for your toolchain.",
+    "caution": "None.",
+    "related": ["cleanupAttrs", "removeUnknownsAndDefaults", "removeEmptyContainers"]
+  },
+  "removeEmptyContainers": {
+    "summary": "Removes elements that do not render and contain no meaningful children.",
+    "whenEnable": "Default; empty groups and wrappers are common bloat.",
+    "whenDisable": "When empty elements are placeholders for runtime injection.",
+    "caution": "Run after removeHiddenElems for best results.",
+    "related": ["removeHiddenElems", "collapseGroups", "removeEmptyText"]
+  },
+  "mergePaths": {
+    "summary": "Combines paths that share styling into fewer elements, reducing DOM size inside the SVG.",
+    "whenEnable": "Flat icons and illustrations with many same-style paths.",
+    "whenDisable": "When separate paths must stay independent for scripting or partial styling.",
+    "caution": "Can change stacking order in edge cases with overlapping paths.",
+    "related": ["convertPathData", "convertShapeToPath", "reusePaths"]
+  },
+  "removeUnusedNS": {
+    "summary": "Removes xmlns declarations that are not referenced anywhere in the document.",
+    "whenEnable": "SVGs with unused namespace declarations from merged files.",
+    "whenDisable": "Documents that will receive injected namespaced content later.",
+    "caution": "None for single-namespace icons.",
+    "related": ["removeXMLNS", "removeEditorsNSData", "cleanupAttrs"]
+  },
+  "reusePaths": {
+    "summary": "Replaces duplicate path definitions with <use> references to a single definition.",
+    "whenEnable": "Icon fonts converted to SVG with repeated glyphs, or repeated shapes.",
+    "whenDisable": "When duplicate paths need independent transforms or IDs.",
+    "caution": "Can complicate editing; test visual output after enabling.",
+    "related": ["mergePaths", "removeUselessDefs", "cleanupIds"]
+  },
+  "sortAttrs": {
+    "summary": "Sorts attributes alphabetically for better gzip compression and consistent diffs.",
+    "whenEnable": "Production assets served with compression; teams caring about VCS diffs.",
+    "whenDisable": "When attribute order is relied on by non-standard parsers (rare).",
+    "caution": "Does not change rendering.",
+    "related": ["cleanupAttrs", "sortDefsChildren", "removeEmptyAttrs"]
+  },
+  "sortDefsChildren": {
+    "summary": "Sorts children inside <defs> for stable output and improved compressibility.",
+    "whenEnable": "SVGs with large symbol libraries or sprite sheets.",
+    "whenDisable": "When defs order matters for human editing workflows only.",
+    "caution": "Does not change rendering.",
+    "related": ["sortAttrs", "removeUselessDefs", "reusePaths"]
+  },
+  "removeTitle": {
+    "summary": "Removes <title> elements used for accessibility tooltips in standalone SVG documents.",
+    "whenEnable": "Decorative icons where accessible name is provided by surrounding HTML.",
+    "whenDisable": "Informative standalone SVGs where <title> is the primary accessible name.",
+    "caution": "Add aria-label on the hosting HTML instead when removing.",
+    "related": ["removeDesc", "removeMetadata", "removeHiddenElems"]
+  },
+  "removeDesc": {
+    "summary": "Removes <desc> long-description elements, saving bytes when not needed.",
+    "whenEnable": "Decorative graphics with no need for extended description in the file.",
+    "whenDisable": "Stand-alone accessible SVGs that rely on <desc> for screen readers.",
+    "caution": "Prefer HTML-level accessibility when SVG is embedded.",
+    "related": ["removeTitle", "removeMetadata", "removeComments"]
+  },
+  "removeDimensions": {
+    "summary": "Removes width/height when viewBox is present so CSS controls sizing.",
+    "whenEnable": "Responsive icons and illustrations scaled with CSS.",
+    "whenDisable": "Assets that need explicit pixel dimensions without CSS.",
+    "caution": "Pair with a valid viewBox; otherwise intrinsic size may collapse.",
+    "related": ["removeViewBox", "cleanupNumericValues", "convertPathData"]
+  },
+  "removeStyleElement": {
+    "summary": "Removes entire <style> blocks after styles have been inlined or are unused.",
+    "whenEnable": "After inlineStyles has flattened rules you still need.",
+    "whenDisable": "SVGs that depend on internal CSS selectors or @rules.",
+    "caution": "Only enable once you confirm styles are inlined or unnecessary.",
+    "related": ["inlineStyles", "minifyStyles", "convertStyleToAttrs"]
+  },
+  "removeScripts": {
+    "summary": "Strips <script> elements and related event attributes from SVG.",
+    "whenEnable": "Static assets where scripts are never executed (most web icons).",
+    "whenDisable": "Interactive SVGs that rely on embedded script.",
+    "caution": "Security-sensitive sites should remove scripts from user uploads.",
+    "related": ["removeMetadata", "removeEditorsNSData", "removeHiddenElems"]
+  },
+  "removeOffCanvasPaths": {
+    "summary": "Removes paths entirely outside the viewBox clipping region.",
+    "whenEnable": "Exports with stray geometry far outside the artboard.",
+    "whenDisable": "Animations or filters that temporarily move paths outside viewBox.",
+    "caution": "Off by default; verify nothing important is clipped away.",
+    "related": ["convertPathData", "removeHiddenElems", "removeViewBox"]
+  }
+}

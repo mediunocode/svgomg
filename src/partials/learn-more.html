@@ -77,7 +77,10 @@
       <ul>
         {% for plugin in plugins %}
           {% if loop.index0 < 12 %}
-            <li><strong>{{ plugin.name }}</strong> (<code>{{ plugin.id }}</code>)</li>
+            <li>
+              <a href="/learn/{{ plugin.id }}/"><strong>{{ plugin.name }}</strong></a>
+              (<code>{{ plugin.id }}</code>)
+            </li>
           {% endif %}
         {% endfor %}
       </ul>
@@ -114,6 +117,22 @@
         sometimes beat SVG on bytes — but SVG wins for themeable, accessible,
         CSS-stylable graphics.
       </p>
+    </section>
+
+    <section>
+      <h3>SVGO plugin guides</h3>
+      <p>
+        Every feature toggle in SVGOMG maps to an SVGO plugin. We publish a
+        dedicated guide for each one with enable/disable advice and troubleshooting:
+      </p>
+      <ul>
+        <li><a href="/learn/removeViewBox/">Remove viewBox</a></li>
+        <li><a href="/learn/cleanupIds/">Clean up IDs</a></li>
+        <li><a href="/learn/convertPathData/">Round/rewrite paths</a></li>
+        <li><a href="/learn/removeMetadata/">Remove &lt;metadata&gt;</a></li>
+        <li><a href="/learn/mergePaths/">Merge paths</a></li>
+      </ul>
+      <p><a href="/learn/">Browse all {{ plugins | length }} SVGO plugin guides</a></p>
     </section>
 
     <section class="learn-more-faq">

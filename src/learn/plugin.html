@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    {% include "partials/seo/analytics-head.html" %}
+    <title>{{ pageTitle }}</title>
+    <meta name="theme-color" content="#303f9f">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ metaDescription }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:title" content="{{ pageTitle }}">
+    <meta property="og:description" content="{{ metaDescription }}">
+    <meta property="og:url" content="{{ canonicalUrl }}">
+    {% include "partials/seo/social-image.html" %}
+    <meta property="og:type" content="article">
+    <link rel="canonical" href="{{ canonicalUrl }}">
+    <link rel="icon" href="/imgs/icon.png">
+    <link rel="apple-touch-icon" href="/imgs/icon.png">
+    {% include "partials/seo/json-ld-article.html" %}
+    <link rel="stylesheet" href="/all.css">
+  </head>
+  <body class="learn-page">
+    <main class="learn-page-main">
+      <div class="learn-page-inner mv-content">
+        {% include "partials/learn-plugin-body.html" %}
+      </div>
+    </main>
+  </body>
+</html>

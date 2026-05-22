@@ -1,0 +1,161 @@
+// Learn routes only load all.css (not inline head.css). global + fonts in
+// all.scss supply the same system stack as the tool; white bg vs checkerboard.
+.learn-page {
+  background: #fff;
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.learn-page-main {
+  padding: 0;
+}
+
+.learn-page-inner {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+
+  @media (min-width: 640px) {
+    padding: 2.5rem 2rem 5rem;
+  }
+}
+
+.learn-page-breadcrumb {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+
+  a {
+    color: #303f9f;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+}
+
+.learn-page-article-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0 0 0.75rem;
+    font-size: 1.65rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #212121;
+  }
+}
+
+.learn-page-plugin-id {
+  font-weight: 400;
+  font-size: 0.85em;
+  color: #555;
+
+  code {
+    font-size: 0.95em;
+  }
+}
+
+.learn-page-lead {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #444;
+}
+
+.learn-page-main section {
+  margin-bottom: 1.75rem;
+
+  h2 {
+    margin: 0 0 0.65rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #303f9f;
+  }
+
+  p,
+  ol {
+    margin: 0 0 0.75rem;
+  }
+
+  ol {
+    padding-left: 1.25rem;
+  }
+
+  li {
+    margin-bottom: 0.35rem;
+  }
+
+  a {
+    color: #303f9f;
+  }
+
+  code {
+    font-size: 0.9em;
+    background-color: #f3f3f3;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+}
+
+.learn-page-cta {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.65rem 1.1rem;
+  background-color: #303f9f;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+
+  &:link,
+  &:visited {
+    color: #fff;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: #1a237e;
+    text-decoration: none;
+  }
+}
+
+.learn-page-plugin-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid #eee;
+  }
+
+  a {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+}
+
+.learn-page-plugin-list-compact {
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+    align-items: baseline;
+  }
+
+  code {
+    font-size: 0.8rem;
+    color: #666;
+  }
+}
+
+.learn-page-related ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}

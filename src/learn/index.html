@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    {% include "partials/seo/analytics-head.html" %}
+    <title>{{ pageTitle }}</title>
+    <meta name="theme-color" content="#303f9f">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ metaDescription }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:title" content="{{ pageTitle }}">
+    <meta property="og:description" content="{{ metaDescription }}">
+    <meta property="og:url" content="{{ canonicalUrl }}">
+    {% include "partials/seo/social-image.html" %}
+    <link rel="canonical" href="{{ canonicalUrl }}">
+    <link rel="icon" href="/imgs/icon.png">
+    <link rel="apple-touch-icon" href="/imgs/icon.png">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "SVGO plugin guides",
+      "description": "{{ metaDescription|e }}",
+      "image": "{{ ogImageUrl|e }}",
+      "url": "{{ canonicalUrl|e }}"
+    }
+    </script>
+    <link rel="stylesheet" href="/all.css">
+  </head>
+  <body class="learn-page">
+    <main class="learn-page-main">
+      <div class="learn-page-inner mv-content">
+        <header class="learn-page-article-header">
+          <p class="learn-page-breadcrumb">
+            <a href="/">SVGOMG</a>
+          </p>
+          <h1>SVGO plugin guides</h1>
+          <p class="learn-page-lead">
+            Long-form reference for every SVGO plugin exposed in
+            <a href="/">SVGOMG</a>. Each page explains what the transform does, when to enable it,
+            and common pitfalls — with links back to the free browser optimizer.
+          </p>
+        </header>
+
+        <section>
+          <h2>Popular plugins</h2>
+          <ul class="learn-page-plugin-list">
+            {% for plugin in featuredPlugins %}
+              <li>
+                <a href="/learn/{{ plugin.id }}/"><strong>{{ plugin.name }}</strong></a>
+                <span class="learn-page-plugin-id"><code>{{ plugin.id }}</code></span>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section>
+          <h2>All plugins (A–Z)</h2>
+          <ul class="learn-page-plugin-list learn-page-plugin-list-compact">
+            {% for plugin in plugins %}
+              <li>
+                <a href="/learn/{{ plugin.id }}/">{{ plugin.name }}</a>
+                <code>{{ plugin.id }}</code>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+
+        <section>
+          <p>
+            <a class="learn-page-cta" href="/">Open SVGOMG optimizer</a>
+            ·
+            <a href="/#how-to-optimize">Optimization walkthrough</a>
+          </p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

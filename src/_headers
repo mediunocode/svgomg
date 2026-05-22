@@ -21,6 +21,15 @@
 /index.html
   Cache-Control: public, max-age=60, stale-while-revalidate=86400
 
+/learn/*
+  Cache-Control: public, max-age=60, stale-while-revalidate=86400
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
 # JSON metadata refreshed at build time.
 /manifest.json
   Cache-Control: public, max-age=3600
@@ -35,6 +44,9 @@
 
 /imgs/*
   Cache-Control: public, max-age=2592000
+
+/imgs/og/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /.well-known/*
   Cache-Control: public, max-age=3600

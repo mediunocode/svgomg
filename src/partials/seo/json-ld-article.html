@@ -1,0 +1,27 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{ pageTitle|e }}",
+  "description": "{{ metaDescription|e }}",
+  "image": "{{ ogImageUrl|e }}",
+  "url": "{{ canonicalUrl|e }}",
+  "author": {
+    "@type": "Organization",
+    "name": "SVGOMG"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SVGOMG"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ canonicalUrl|e }}"
+  },
+  "about": {
+    "@type": "SoftwareApplication",
+    "name": "SVGO",
+    "applicationCategory": "DeveloperApplication"
+  }
+}
+</script>
