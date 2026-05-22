@@ -1,0 +1,38 @@
+---
+description: Deployment + hosting context for svgomg.net
+alwaysApply: true
+---
+
+# Deployment
+
+`svgomg.net` is hosted on **Cloudflare Pages**, auto-deployed from the `main` branch of `mediunocode/svgomg`.
+
+- The deploy step in [.github/workflows/ci.yml](../../.github/workflows/ci.yml) is gated on `github.repository == 'jakearchibald/svgomg'`, so it never runs on this fork — Cloudflare Pages handles deploys directly. Do not "fix" or repurpose that workflow unless explicitly asked.
+- Build command on Cloudflare Pages: `npm run build`. Output directory: `build/`.
+- Pushing to `main` triggers a production deploy. Pushing to any other branch triggers a preview deploy.
+
+## HTTP headers / caching
+
+Because the SPA used to ship cache-busting `<meta>` tags that we removed in T1, response caching is now controlled at the edge by Cloudflare Pages.
+
+- HTTP header overrides live in a `_headers` file placed at the **root of the build output** (`build/_headers`). It must be emitted by the gulp build (see `copy()` in [gulpfile.js](../../gulpfile.js)).
+- For ad-revenue and CWV correctness, the headers strategy is:
+  - `/ads.txt` → very short cache (e.g. `max-age=300`) so Mediavine config changes propagate fast.
+  - `/` and other HTML → short cache (e.g. `max-age=60, stale-while-revalidate=86400`) so Mediavine script-tag changes propagate.
+  - `/*.js`, `/*.css`, `/fonts/*`, `/imgs/*` → long cache (`max-age=31536000, immutable`) once content-hashed filenames are in place; until then, `max-age=3600`.
+- Redirects (e.g. future `/learn/...` slugs, locale routes) go in a `_redirects` file in the build output.
+
+## Cloudflare-specific gotchas
+
+- The service worker in [src/js/sw/index.js](../../src/js/sw/index.js) does stale-while-revalidate for HTML navigations. Cloudflare's edge cache can add a *second* staleness layer — keep the edge HTML TTL short so the two layers don't compound into hours-stale ad scripts.
+- The Mediavine script (`scripts.scriptwrapper.com`) is third-party; Cloudflare doesn't proxy or cache it. Don't try to.
+- Cloudflare Pages serves `ads.txt` from the build output. There is no Pages-side redirect to a Mediavine-managed URL — the file in `src/ads.txt` is the source of truth.
+
+## Build output verification
+
+After any deploy-affecting change, verify `build/` contains:
+
+- `index.html` with no `Cache-Control` meta tags
+- `ads.txt` with the Journey publisher tag `2c461a95-b411-46fc-a6e5-dd2367e0257a`
+- `sw.js` with the cross-origin skip and `/ads.txt` bypass logic
+- (once added) `_headers` and any `_redirects`
