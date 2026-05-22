@@ -18,6 +18,37 @@
 .learn-more-header {
   margin-bottom: 2rem;
 
+  .learn-more-back {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .tool-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #303f9f;
+    text-decoration: none;
+    font-weight: 500;
+
+    .icon-arrow-up {
+      width: 1.25rem;
+      height: 1.25rem;
+      fill: currentcolor;
+      flex: none;
+    }
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+
+    &:focus {
+      outline: 2px solid #303f9f;
+      outline-offset: 2px;
+    }
+  }
+
   h2 {
     margin: 0 0 0.75rem;
     font-size: 1.5rem;
@@ -96,4 +127,11 @@
 
 .learn-more-faq dl dt {
   color: #212121;
+}
+
+// Mediavine Journey injects in-content units into these placeholders.
+/* stylelint-disable-next-line selector-class-pattern -- Mediavine API class name */
+.content_hint {
+  min-height: 250px;
+  margin: 1.5rem 0;
 }

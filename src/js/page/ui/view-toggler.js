@@ -1,5 +1,10 @@
 import { createNanoEvents } from 'nanoevents';
-import { domReady } from '../utils.js';
+import {
+  dismissMainMenu,
+  domReady,
+  scrollToGuide,
+  scrollToTool,
+} from '../utils.js';
 
 /**
  * Tabs that toggle between showing the SVG image and XML markup.
@@ -22,13 +27,18 @@ export default class ViewToggler {
         });
       });
 
-      const guideLink = document.querySelector('.material-tab-link');
-      if (guideLink) {
-        guideLink.addEventListener('click', (event) => {
+      for (const link of document.querySelectorAll('.guide-link')) {
+        link.addEventListener('click', (event) => {
           event.preventDefault();
-          const toolHeight = document.querySelector('.app-output').offsetHeight;
-          window.scrollTo({ top: toolHeight, behavior: 'smooth' });
-          history.pushState(null, '', '#how-to-optimize');
+          scrollToGuide();
+          dismissMainMenu();
+        });
+      }
+
+      for (const link of document.querySelectorAll('.tool-link')) {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          scrollToTool();
         });
       }
     });

@@ -73,6 +73,26 @@ function transitionClassFunc({ removeClass = false } = {}) {
 export const transitionToClass = transitionClassFunc();
 export const transitionFromClass = transitionClassFunc({ removeClass: true });
 
+export function scrollToGuide() {
+  const toolHeight = document.querySelector('.app-output').offsetHeight;
+  window.scrollTo({ top: toolHeight, behavior: 'smooth' });
+  history.pushState(null, '', '#how-to-optimize');
+}
+
+export function scrollToTool() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  history.pushState(null, '', location.pathname + location.search);
+}
+
+export function dismissMainMenu() {
+  const mainMenu = document.querySelector('.main-menu');
+  if (mainMenu.classList.contains('hidden')) return;
+
+  mainMenu.classList.add('hidden');
+  mainMenu.querySelector('.overlay').classList.add('hidden');
+  mainMenu.querySelector('.menu').classList.add('hidden');
+}
+
 export function trackFocusMethod() {
   let focusMethod = 'mouse';
 

@@ -44,7 +44,8 @@
 .action-button-container {
   position: absolute;
   z-index: 2;
-  bottom: calc(-28px + var(--mv-adhesion-height));
+  // .app-output padding-bottom reserves the adhesion strip.
+  bottom: 12px;
   right: 13px;
   display: flex;
   align-items: center;
@@ -58,8 +59,9 @@
   }
 
   @media (min-width: 640px) {
-    right: 30px;
-    bottom: calc(30px + var(--mv-adhesion-height));
+    // Flush with the settings column; bottom tracks the inset panel at 900px+.
+    right: 16px;
+    bottom: 12px;
 
     .results-container {
       margin-right: -17px;
@@ -79,7 +81,7 @@
   }
 
   @media (min-width: 900px) {
-    right: 0;
+    bottom: calc(12px + 30px);
   }
 
 }
@@ -136,13 +138,11 @@
 }
 
 .action-button-container {
-  // Off-screen until an SVG loads. Horizontal hide on mobile; vertical on desktop.
-  // Hide distance includes --mv-adhesion-height so the slide-in ends at the
-  // ad-cleared resting position (bottom calc above).
+  // Off-screen until an SVG loads.
   transform: translateX(calc(100% + 32px));
 
   @media (min-width: 640px) {
-    transform: translateY(calc(188px + var(--mv-adhesion-height)));
+    transform: translateY(188px);
   }
 
   &.transition {

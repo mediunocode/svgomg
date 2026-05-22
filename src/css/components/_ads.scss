@@ -2,7 +2,8 @@
 // bottom edge. Reserve space so injected ads don't cause CLS or cover controls.
 
 :root {
-  --mv-adhesion-height: 0px;
+  /* Unit required: unitless 0 breaks calc() in bottom/transform on .action-button-container */
+  --mv-adhesion-height: 0px; /* stylelint-disable-line length-zero-no-unit */
 }
 
 @media (max-width: 639px) {
@@ -11,9 +12,10 @@
   }
 }
 
-@media (min-width: 640px) and (max-width: 1023px) {
+// Tablet + desktop adhesion is ~90px tall; 50px / 0px left tools under the banner.
+@media (min-width: 640px) {
   :root {
-    --mv-adhesion-height: 50px;
+    --mv-adhesion-height: 90px;
   }
 }
 
