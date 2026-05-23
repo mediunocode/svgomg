@@ -9,8 +9,10 @@
   overflow: hidden auto;
   -webkit-overflow-scrolling: touch; // TODO: revisit this later
   flex: 1;
+  min-height: 0;
   transform: translateZ(0);
-  padding-bottom: 110px;
+  // Scroll end padding inside the panel (panel itself already clears the banner).
+  padding-bottom: calc(var(--settings-panel-edge-gap) + 16px);
 }
 
 .setting-item-toggle {

@@ -22,6 +22,7 @@
   },
   "removeMetadata": {
     "summary": "Deletes <metadata> blocks (often license, layer names, or XMP from Adobe tools). Safe byte savings with no visual effect.",
+    "topicGuideIntro": "For related metadata and editor cleanup plugins, see the",
     "whenEnable": "Shipping icons and UI graphics to production.",
     "whenDisable": "When you must preserve embedded rights or workflow metadata for compliance.",
     "caution": "None for most web use cases.",
@@ -31,7 +32,7 @@
     "summary": "Removes redundant default xmlns attributes when they can be inferred, shrinking attribute noise.",
     "whenEnable": "Standalone SVG files embedded where the namespace is implicit.",
     "whenDisable": "SVGs used as documents, mixed namespaces, or fragments that rely on explicit xmlns.",
-    "caution": "Can break unusual namespace setups; off by default in SVGOMG.",
+    "caution": "Can break unusual namespace setups; off by default on SVGOMG.net.",
     "related": ["removeUnusedNS", "removeEditorsNSData", "cleanupAttrs"]
   },
   "removeEditorsNSData": {
@@ -78,6 +79,7 @@
   },
   "cleanupIds": {
     "summary": "Shortens and deduplicates id attributes and updates url(#…) references. Essential for minifying Illustrator exports that ship long random IDs.",
+    "topicGuideIntro": "ID cleanup is grouped with other high-risk transforms in the",
     "whenEnable": "Almost always for production assets unless you rely on stable IDs for CSS, JS, or SMIL animation.",
     "whenDisable": "SVGs with external stylesheets targeting specific IDs, or animations that reference fixed id values you cannot rename.",
     "caution": "Can break fragment references if plugins run in the wrong order or IDs are referenced from outside the file.",
@@ -99,7 +101,7 @@
   },
   "cleanupNumericValues": {
     "summary": "Rounds numeric attributes (coordinates, opacities) to fewer decimal places.",
-    "whenEnable": "Most web SVGs; tune global number precision in SVGOMG.",
+    "whenEnable": "Most web SVGs; tune global number precision on SVGOMG.net.",
     "whenDisable": "Scientific plots or maps needing many decimal places.",
     "caution": "Works with convertPathData; combined rounding can compound.",
     "related": ["convertPathData", "convertTransform", "cleanupListOfValues"]
@@ -141,6 +143,7 @@
   },
   "removeViewBox": {
     "summary": "Strips the viewBox attribute so width and height alone define layout. That often saves bytes but breaks responsive scaling when CSS only sets one dimension.",
+    "topicGuideIntro": "This plugin is a common cause of broken responsive SVGs; see the",
     "whenEnable": "Fixed-size icons and assets that never scale (favicons, pixel-perfect UI sprites).",
     "whenDisable": "Responsive SVGs, logos in fluid layouts, or anything using CSS max-width with only a viewBox for aspect ratio.",
     "caution": "After removal, the graphic may render at the wrong size or clip unexpectedly in browsers.",
@@ -197,7 +200,8 @@
   },
   "convertPathData": {
     "summary": "Rewrites path commands with fewer digits and simpler curves. Usually one of the largest wins on complex illustrations.",
-    "whenEnable": "Detailed paths from design tools with over-precise coordinates (default in SVGOMG).",
+    "topicGuideIntro": "Path rounding is often tuned together with other geometry plugins in the",
+    "whenEnable": "Detailed paths from design tools with over-precise coordinates (default on SVGOMG.net).",
     "whenDisable": "When sub-pixel accuracy matters for animation paths or geometric CAD-like drawings.",
     "caution": "Aggressive rounding can visibly change curves on large viewBoxes; lower number precision if you see drift.",
     "related": ["cleanupNumericValues", "convertTransform", "mergePaths"]

@@ -1,9 +1,14 @@
-// The tool shell is a fixed 100vh viewport; adhesion banners overlay its
-// bottom edge. Reserve space so injected ads don't cause CLS or cover controls.
+// The tool shell fills the viewport below the site toolbar; adhesion banners
+// overlay its bottom edge. Reserve space so injected ads don't cause CLS or cover controls.
 
 :root {
   /* Unit required: unitless 0 breaks calc() in bottom/transform on .action-button-container */
   --mv-adhesion-height: 0px; /* stylelint-disable-line length-zero-no-unit */
+  --settings-panel-width: 21.1em;
+  /* Breathing room between panel/tools and the bottom of .app-output (above the banner). */
+  --settings-panel-edge-gap: 12px;
+  /* Inset for .action-button-container; .app-output already clears --mv-adhesion-height. */
+  --settings-panel-bottom-gap: var(--settings-panel-edge-gap);
 }
 
 @media (max-width: 639px) {
@@ -16,10 +21,18 @@
 @media (min-width: 640px) {
   :root {
     --mv-adhesion-height: 90px;
+    --settings-panel-edge-gap: 0px; /* stylelint-disable-line length-zero-no-unit */
+    --settings-panel-bottom-gap: 0px; /* stylelint-disable-line length-zero-no-unit */
+  }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --settings-panel-edge-gap: 30px;
+    --settings-panel-bottom-gap: var(--settings-panel-edge-gap);
   }
 }
 
 .app-output {
-  padding-bottom: var(--mv-adhesion-height);
   box-sizing: border-box;
 }

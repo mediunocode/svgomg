@@ -1,0 +1,18 @@
+[
+  {
+    "question": "Is my SVG uploaded to a server?",
+    "answer": "No. Optimization runs entirely in your browser via a Web Worker. Your files never leave your device."
+  },
+  {
+    "question": "Can I use the output commercially?",
+    "answer": "SVGOMG.net does not change licensing of your artwork. Optimized output is still your SVG — check your source asset license as usual."
+  },
+  {
+    "question": "What is SVGO?",
+    "answer": "SVGO (SVG Optimizer) is an open-source Node.js library that applies dozens of structural and syntactic transforms to shrink SVG files. SVGOMG.net exposes those options visually."
+  },
+  {
+    "question": "How much smaller will my file get?",
+    "answer": "It depends on the source. Illustrator, Figma, and Sketch exports with lots of metadata often shrink dramatically. Already-minified SVGs from a previous SVGO pass may only improve a few percent."
+  }
+]

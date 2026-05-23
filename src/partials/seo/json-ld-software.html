@@ -2,7 +2,7 @@
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  "name": "SVGOMG",
+  "name": "SVGOMG.net",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Web",
   "offers": {
@@ -10,11 +10,27 @@
     "price": "0",
     "priceCurrency": "USD"
   },
-  "description": "Free browser-based GUI for SVGO. Optimize and minify SVG images without uploading files to a server.",
-  "url": "{{ liveBaseUrl }}",
-  "softwareHelp": {
-    "@type": "WebPage",
-    "url": "{{ liveBaseUrl }}#how-to-optimize"
-  }
+  "description": "Free browser-based GUI for SVGO on SVGOMG.net. Optimize and minify SVG images without uploading files to a server.",
+  "url": "{{ liveBaseUrl|e }}",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}"
+  },
+  "softwareHelp": [
+    {
+      "@type": "WebPage",
+      "name": "How to optimize SVG files",
+      "url": "{{ liveBaseUrl }}how-to-optimize/"
+    },
+    {
+      "@type": "WebPage",
+      "name": "SVGO Plugin Guide",
+      "url": "{{ liveBaseUrl }}plugins/"
+    }
+  ],
+  "sameAs": [
+    "https://github.com/jakearchibald/svgomg"
+  ]
 }
 </script>

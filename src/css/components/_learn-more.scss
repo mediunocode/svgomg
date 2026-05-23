@@ -1,8 +1,11 @@
 .learn-more {
   background-color: #fff;
-  border-top: 1px solid #d7d7d7;
   color: #333;
   line-height: 1.6;
+}
+
+.learn-page .learn-more {
+  border-top: none;
 }
 
 .learn-more-inner {
@@ -23,7 +26,7 @@
     font-size: 0.9rem;
   }
 
-  .tool-link {
+  .learn-more-back a {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -49,7 +52,7 @@
     }
   }
 
-  h2 {
+  h1 {
     margin: 0 0 0.75rem;
     font-size: 1.5rem;
     font-weight: 600;

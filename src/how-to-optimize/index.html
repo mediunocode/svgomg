@@ -13,20 +13,43 @@
     <meta property="og:description" content="{{ metaDescription }}">
     <meta property="og:url" content="{{ canonicalUrl }}">
     {% include "partials/seo/social-image.html" %}
-    <meta property="og:type" content="article">
+    {% include "partials/seo/json-ld-website.html" %}
+    {% include "partials/seo/json-ld-faq.html" %}
+    {% include "partials/seo/json-ld-breadcrumb.html" %}
     <link rel="canonical" href="{{ canonicalUrl }}">
     <link rel="icon" href="/imgs/icon.png">
     <link rel="apple-touch-icon" href="/imgs/icon.png">
-    {% include "partials/seo/json-ld-article.html" %}
-    {% include "partials/seo/json-ld-breadcrumb.html" %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "How to optimize SVG files",
+      "description": "{{ metaDescription|e }}",
+      "image": "{{ ogImageUrl|e }}",
+      "url": "{{ canonicalUrl|e }}",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SVGOMG.net",
+        "url": "{{ liveBaseUrl|e }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "SVGOMG.net",
+        "url": "{{ liveBaseUrl|e }}"
+      },
+      "about": {
+        "@type": "SoftwareApplication",
+        "name": "SVGOMG.net",
+        "url": "{{ liveBaseUrl|e }}"
+      }
+    }
+    </script>
     <link rel="stylesheet" href="/all.css">
   </head>
   <body class="learn-page site-with-toolbar">
     {% include "partials/site-toolbar.html" %}
     <main class="learn-page-main">
-      <div class="learn-page-inner mv-content">
-        {% include "partials/learn-plugin-body.html" %}
-      </div>
+      {% include "partials/learn-more.html" %}
     </main>
   </body>
 </html>

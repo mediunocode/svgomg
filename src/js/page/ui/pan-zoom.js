@@ -108,6 +108,35 @@ export default class PanZoom {
     this._update();
   }
 
+  setCenteredScale(scale, { containerWidth, containerHeight }) {
+    this._scale = scale;
+    // scale() then translate(); origin 0 0 — keep the CSS-centered iframe at the container midpoint
+    this._dx = (containerWidth * (1 - scale)) / 2;
+    this._dy = (containerHeight * (1 - scale)) / 2;
+    this._update();
+  }
+
+  fitCentered({
+    containerWidth,
+    containerHeight,
+    contentWidth,
+    contentHeight,
+    maxScale = Infinity,
+    padding = 0.95,
+  } = {}) {
+    const scale = Math.min(
+      (containerWidth / contentWidth) * padding,
+      (containerHeight / contentHeight) * padding,
+      maxScale,
+    );
+    this.setCenteredScale(scale, { containerWidth, containerHeight });
+    return scale;
+  }
+
+  isAtDefaultTransform() {
+    return this._scale === 1 && this._dx === 0 && this._dy === 0;
+  }
+
   _onWheel(event) {
     if (!this._shouldCaptureFunc(event.target)) return;
     event.preventDefault();

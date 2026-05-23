@@ -1,0 +1,130 @@
+{% set mode = siteToolbarMode|default('tool') %}
+{% set active = siteToolbarActive|default('') %}
+<div class="toolbar toolbar-site">
+  <div class="toolbar-brand">
+    <a href="/" class="toolbar-brand-logo" aria-label="SVGOMG.net">
+      {% include "partials/icons/logo.svg" %}
+    </a>
+    <div class="toolbar-brand-copy">
+      <a href="/" class="toolbar-brand-title">SVGOMG.net</a>
+      <p class="toolbar-brand-meta">
+        Powered by <a href="https://github.com/svg/svgo">SVGO v{{ SVGO_VERSION }}</a>
+      </p>
+    </div>
+  </div>
+  <nav class="toolbar-nav material-tabs">
+    {% if mode == 'tool' %}
+      <button class="toolbar-action load-file unbutton" type="button" title="Open SVG">
+        {% include "partials/icons/open.svg" %}
+        <span class="toolbar-action-text">Open SVG</span>
+      </button>
+      <label class="toolbar-action toolbar-paste menu-input" title="Paste markup">
+        {% include "partials/icons/paste.svg" %}
+        <span class="input-area">
+          <textarea class="paste-input" aria-label="Paste SVG markup"></textarea>
+          <span class="toolbar-action-text label-txt">Paste markup</span>
+        </span>
+      </label>
+      <button class="toolbar-action load-demo unbutton" type="button" title="Demo">
+        {% include "partials/icons/demo.svg" %}
+        <span class="toolbar-action-text">Demo</span>
+      </button>
+      <div class="toolbar-output-nav">
+        <form class="view-toggler toolbar-view-toggler">
+          <label class="material-tab" title="Image preview">
+            <input type="radio" name="output" value="image" checked>
+            <span class="selected"></span>
+            {% include "partials/icons/image.svg" %}
+            <span class="toolbar-action-text">Image</span>
+          </label>
+          <label class="material-tab" title="Markup">
+            <input type="radio" name="output" value="code">
+            <span class="selected"></span>
+            {% include "partials/icons/markup.svg" %}
+            <span class="toolbar-action-text">Markup</span>
+          </label>
+        </form>
+      </div>
+    {% else %}
+      <button class="toolbar-action load-file unbutton" type="button" title="Open SVG">
+        {% include "partials/icons/open.svg" %}
+        <span class="toolbar-action-text">Open SVG</span>
+      </button>
+      <label class="toolbar-action toolbar-paste menu-input" title="Paste markup">
+        {% include "partials/icons/paste.svg" %}
+        <span class="input-area">
+          <textarea class="paste-input" aria-label="Paste SVG markup"></textarea>
+          <span class="toolbar-action-text label-txt">Paste markup</span>
+        </span>
+      </label>
+      <a href="/" class="toolbar-action load-demo" title="Demo">
+        {% include "partials/icons/demo.svg" %}
+        <span class="toolbar-action-text">Demo</span>
+      </a>
+      <div class="toolbar-output-nav">
+        <div class="toolbar-view-toggler toolbar-view-toggler--disabled" aria-disabled="true">
+          <span class="material-tab" title="Image preview">
+            {% include "partials/icons/image.svg" %}
+            <span class="toolbar-action-text">Image</span>
+          </span>
+          <span class="material-tab" title="Markup">
+            {% include "partials/icons/markup.svg" %}
+            <span class="toolbar-action-text">Markup</span>
+          </span>
+        </div>
+      </div>
+    {% endif %}
+    <span class="toolbar-nav-divider" role="presentation" aria-hidden="true"></span>
+    <a href="/how-to-optimize/" class="material-tab material-tab-link toolbar-action{% if active == 'guide' %} is-active{% endif %}" title="How to optimize SVG">
+      {% include "partials/icons/guide.svg" %}
+      <span class="toolbar-action-text">How to optimize SVG</span>
+    </a>
+    <a href="/plugins/" class="material-tab material-tab-link toolbar-action{% if active == 'plugins' %} is-active{% endif %}" title="SVGO Plugin Guide">
+      {% include "partials/icons/plugin-guides.svg" %}
+      <span class="toolbar-action-text">SVGO Plugin Guide</span>
+    </a>
+  </nav>
+  <input type="file" class="load-file-input" accept=".svg" hidden>
+  {% if mode != 'tool' %}
+    <script>
+      (function () {
+        var loadBtn = document.querySelector('.toolbar-action.load-file');
+        var fileInput = document.querySelector('.load-file-input');
+        var pasteInput = document.querySelector('.toolbar-paste .paste-input');
+
+        function handoff(data, filename) {
+          try {
+            sessionStorage.setItem('pending-svg-data', data);
+            sessionStorage.setItem('pending-svg-name', filename || 'image.svg');
+          } catch (e) {}
+          location.href = '/';
+        }
+
+        if (loadBtn && fileInput) {
+          loadBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            fileInput.click();
+          });
+          fileInput.addEventListener('change', function () {
+            var file = fileInput.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function () {
+              handoff(String(reader.result), file.name);
+            };
+            reader.readAsText(file);
+          });
+        }
+
+        if (pasteInput) {
+          pasteInput.addEventListener('input', function () {
+            var value = pasteInput.value;
+            if (!value.includes('</svg>')) return;
+            pasteInput.value = '';
+            handoff(value, 'image.svg');
+          });
+        }
+      })();
+    </script>
+  {% endif %}
+</div>

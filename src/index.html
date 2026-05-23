@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    {% include "partials/seo/ui-font-head.html" %}
     <link rel="preconnect" href="https://scripts.scriptwrapper.com" crossorigin>
     <link rel="dns-prefetch" href="//scripts.scriptwrapper.com">
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
@@ -43,6 +44,10 @@
       }
 
       window.version = '{{SVGOMG_VERSION}}';
+
+      if (location.hash === '#how-to-optimize') {
+        location.replace('/how-to-optimize/' + location.search);
+      }
     </script>
     <script id="mediavine-journey" type="text/javascript" async data-noptimize="1" data-cfasync="false" src="//scripts.scriptwrapper.com/tags/2c461a95-b411-46fc-a6e5-dd2367e0257a.js"></script>
     <script>
@@ -51,86 +56,15 @@
       }
     </script>
     {% include "partials/seo/json-ld-software.html" %}
+    {% include "partials/seo/json-ld-website.html" %}
     <script src="js/page.js" defer></script>
     <style>{{headCSS|safe}}</style>
     <link rel="preload" as="style" href="all.css" onload="rel='stylesheet'">
   </head>
-  <body>
+  <body class="site-with-toolbar">
+    {% include "partials/site-toolbar.html" %}
+    <div class="toolbar-extra"></div>
     <div class="app-output">
-      <div class="main-menu">
-        <div class="overlay"></div>
-        <nav class="menu">
-          <div class="app-title">
-            {% include "partials/icons/logo.svg" %}
-            <div class="title-text">
-              <h1>SVGOMG</h1>
-              <p>Powered by <a href="https://github.com/svg/svgo">SVGO v{{ SVGO_VERSION }}</a></p>
-            </div>
-          </div>
-          <ul>
-            <li>
-              <button class="load-file unbutton menu-item" type="button">
-                {% include "partials/icons/open.svg" %}
-                <span class="menu-item-text">Open SVG</span>
-              </button>
-              <input type="file" class="load-file-input" accept=".svg">
-            </li>
-            <li>
-              <label class="menu-input menu-item">
-                {% include "partials/icons/paste.svg" %}
-                <span class="input-area">
-                  <textarea class="paste-input"></textarea>
-                  <span class="label-txt">Paste markup</span>
-                </span>
-              </label>
-            </li>
-            <li>
-              <button class="load-demo unbutton menu-item" type="button">
-                {% include "partials/icons/demo.svg" %}
-                <span class="menu-item-text">Demo</span>
-              </button>
-            </li>
-            <li>
-              <a href="#how-to-optimize" class="menu-item guide-link">
-                {% include "partials/icons/guide.svg" %}
-                <span class="menu-item-text">How to optimize</span>
-              </a>
-            </li>
-            <li>
-              <a href="/plugins/" class="menu-item">
-                {% include "partials/icons/plugin-guides.svg" %}
-                <span class="menu-item-text">Plugin Guide</span>
-              </a>
-            </li>
-          </ul>
-          <div class="menu-extra"></div>
-        </nav>
-      </div>
-      <div class="toolbar">
-        <div class="menu-toolbar-item">
-          <button class="unbutton menu-btn" type="button" title="Menu">
-            {% include "partials/icons/menu.svg" %}
-          </button>
-        </div>
-        <div class="toolbar-tabs material-tabs">
-          <form class="view-toggler">
-            <label class="material-tab">
-              <input type="radio" name="output" value="image" checked>
-              <span class="selected"></span>
-              Image
-            </label>
-            <label class="material-tab">
-              <input type="radio" name="output" value="code">
-              <span class="selected"></span>
-              Markup
-            </label>
-          </form>
-          <a class="material-tab material-tab-link guide-link" href="#how-to-optimize">
-            <span class="selected"></span>
-            How to optimize
-          </a>
-        </div>
-      </div>
       <div class="main">
         <div class="output">
           <div class="action-button-container">
@@ -215,6 +149,5 @@
         });
       </script>
     </div>
-    {% include "partials/learn-more.html" %}
   </body>
 </html>

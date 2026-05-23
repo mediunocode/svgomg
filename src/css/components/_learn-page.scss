@@ -1,10 +1,11 @@
-// Learn routes only load all.css (not inline head.css). global + fonts in
-// all.scss supply the same system stack as the tool; white bg vs checkerboard.
+// Learn routes load DM Sans via ui-font-head.html (same as the site toolbar).
 .learn-page {
+  font-family: var(--site-ui-font-family);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
   background: #fff;
   color: #333;
   line-height: 1.6;
-  min-height: 100vh;
 }
 
 .learn-page-main {
@@ -158,4 +159,48 @@
 .learn-page-related ul {
   margin: 0;
   padding-left: 1.25rem;
+}
+
+.learn-page-topic-list,
+.learn-page-cluster-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  a {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: underline;
+    }
+  }
+}
+
+.learn-page-cluster-summary {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.learn-more-header .learn-page-breadcrumb {
+  margin-bottom: 0.75rem;
 }

@@ -1,7 +1,7 @@
 .app-output {
   position: relative;
-  height: 100vh;
-  min-height: 100vh;
+  flex: 1 1 0;
+  min-height: 0;
   overflow: hidden;
   display: flex;
   flex-flow: column;
@@ -9,22 +9,33 @@
 
 .settings {
   flex: 0.9 1 0;
+  min-height: 0;
   overflow: hidden;
+  z-index: 1;
 
   @media (min-width: 640px) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--settings-panel-width);
     flex: none;
-    width: 21.1em;
   }
 
   @media (min-width: 900px) {
-    margin: 30px;
+    top: var(--settings-panel-edge-gap);
+    right: var(--settings-panel-edge-gap);
+    bottom: var(--settings-panel-edge-gap);
+    width: var(--settings-panel-width);
     border-radius: 2px;
     border: 1px solid #d7d7d7;
   }
 }
 
 .main {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
+  position: relative;
   display: flex;
   flex-flow: column;
   // Firefox needs this to limit size of main
@@ -37,57 +48,72 @@
 
 .output {
   flex: 1 1 0;
+  min-height: 0;
   position: relative;
   overflow: hidden;
+
+  @media (min-width: 640px) {
+    position: absolute;
+    inset: 0;
+    flex: none;
+    width: auto;
+    height: auto;
+  }
 }
 
 .action-button-container {
   position: absolute;
   z-index: 2;
-  // .app-output padding-bottom reserves the adhesion strip.
-  bottom: 12px;
+  bottom: var(--settings-panel-bottom-gap);
   right: 13px;
   display: flex;
   align-items: center;
 
   .minor-action-container {
     display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
 
-    .floating-action-button {
+    .floating-action-button,
+    .download-png-control {
       margin-right: 10px;
     }
   }
 
   @media (min-width: 640px) {
-    // Flush with the settings column; bottom tracks the inset panel at 900px+.
-    right: 16px;
-    bottom: 12px;
+    // Sit just left of the settings column (output is full-bleed behind the panel).
+    right: calc(var(--settings-panel-width) + 16px);
+
+    @media (min-width: 900px) {
+      right: calc(
+        var(--settings-panel-width) + var(--settings-panel-edge-gap) + 16px
+      );
+    }
 
     .results-container {
       margin-right: -17px;
     }
 
     .minor-action-container {
-      flex-flow: column;
+      flex-flow: column nowrap;
+      align-items: flex-end;
       position: absolute;
       bottom: 58px;
       right: 8px;
 
-      .floating-action-button {
+      .floating-action-button,
+      .download-png-control {
         margin-bottom: 10px;
         margin-right: 0;
       }
     }
   }
 
-  @media (min-width: 900px) {
-    bottom: calc(12px + 30px);
-  }
-
 }
 
 // so these UI elements are above output
-.toolbar {
+.toolbar,
+.toolbar-extra {
   z-index: 2;
 }
 .setting {
@@ -96,24 +122,11 @@
 
 // shadows
 .settings,
-.toolbar {
+.toolbar:not(.toolbar-site) {
   box-shadow: 0 0 11px rgba(0, 0, 0, 0.4);
 
   @media (min-width: 640px) {
     box-shadow: 0 4px 11px rgba(0, 0, 0, 0.3);
-  }
-}
-
-// initial state
-.toolbar {
-  transform: translateY(-110%);
-
-  &.transition {
-    transition: transform 0.2s ease-out;
-  }
-
-  &.active {
-    transform: translateZ(0);
   }
 }
 

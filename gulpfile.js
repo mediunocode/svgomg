@@ -97,9 +97,89 @@ const resolveRelatedPlugins = (pluginId, plugins, learnContent) => {
     .map(withPluginSlug);
 };
 
+const validateLearnClusters = (pluginIds, learnClusters) => {
+  const assigned = new Map();
+  const clusterSlugs = Object.keys(learnClusters);
+
+  for (const slug of clusterSlugs) {
+    const entry = learnClusters[slug];
+    if (!entry?.title || !entry?.description || !entry?.intro) {
+      throw new Error(`learn-clusters.json: "${slug}" needs title, description, and intro`);
+    }
+    if (!Array.isArray(entry.pluginIds) || entry.pluginIds.length === 0) {
+      throw new Error(`learn-clusters.json: "${slug}" needs a non-empty pluginIds array`);
+    }
+    for (const id of entry.pluginIds) {
+      if (!pluginIds.includes(id)) {
+        throw new Error(`learn-clusters.json: unknown plugin id "${id}" in "${slug}"`);
+      }
+      if (assigned.has(id)) {
+        throw new Error(
+          `learn-clusters.json: "${id}" assigned to both "${assigned.get(id)}" and "${slug}"`,
+        );
+      }
+      assigned.set(id, slug);
+    }
+  }
+
+  const missing = pluginIds.filter((id) => !assigned.has(id));
+  if (missing.length) {
+    throw new Error(
+      `learn-clusters.json: plugins not assigned to any cluster: ${missing.join(', ')}`,
+    );
+  }
+};
+
+const buildPluginClusterMap = (learnClusters) => {
+  const map = new Map();
+  for (const [slug, entry] of Object.entries(learnClusters)) {
+    for (const pluginId of entry.pluginIds) {
+      map.set(pluginId, { slug, ...entry });
+    }
+  }
+  return map;
+};
+
+const buildClustersForTemplates = (learnClusters, plugins, learnContent) =>
+  Object.entries(learnClusters).map(([slug, entry]) => ({
+    slug,
+    title: entry.title,
+    description: entry.description,
+    intro: entry.intro,
+    seeAlsoClusterSlugs: entry.seeAlsoClusterSlugs || [],
+    clusterPlugins: entry.pluginIds
+      .map((id) => {
+        const plugin = plugins.find((p) => p.id === id);
+        if (!plugin) return null;
+        const learn = learnContent[id];
+        return {
+          plugin,
+          summary: learn?.summary || null,
+        };
+      })
+      .filter(Boolean),
+  }));
+
+const resolveSeeAlsoClusters = (clusterSlug, learnClusters, clustersForTemplates) => {
+  const slugs = learnClusters[clusterSlug]?.seeAlsoClusterSlugs || [];
+  return slugs
+    .map((slug) => clustersForTemplates.find((c) => c.slug === slug))
+    .filter(Boolean)
+    .map(({ slug, title }) => ({ slug, title }));
+};
+
+const buildBreadcrumbList = (liveBaseUrl, items) =>
+  items.map((item) => ({
+    name: item.name,
+    url: item.url.startsWith('http') ? item.url : `${liveBaseUrl}${item.url.replace(/^\//, '')}`,
+  }));
+
+const showPluginCaution = (learn) =>
+  Boolean(learn?.caution && !/^None\b/.test(learn.caution));
+
 const buildPluginPageMeta = (plugin) => {
   const pageTitle = `${plugin.name} – SVGO Plugin Guide | SVGOMG`;
-  const metaDescription = `When to use SVGO ${plugin.id} (${plugin.name}) in SVGOMG. Enable safely, avoid broken SVGs, and optimize in the browser.`;
+  const metaDescription = `When to use SVGO ${plugin.id} (${plugin.name}) on SVGOMG.net. Enable safely, avoid broken SVGs, and optimize in the browser.`;
   return { pageTitle, metaDescription };
 };
 
@@ -207,6 +287,7 @@ async function html() {
         description:
           'Free online SVG optimizer and minifier. Compress SVG images with SVGO in your browser — no upload required.',
         iconPath: siteContext.iconPath,
+        siteToolbarMode: 'tool',
       }),
     )
     .pipe(gulpif(!IS_DEV_TASK, gulpHtmlmin(buildConfig.htmlmin)))
@@ -214,10 +295,18 @@ async function html() {
 }
 
 async function learnHtmlWrite() {
-  const { config, liveBaseUrl, iconPath } = await loadSiteContext();
+  const { config, liveBaseUrl, iconPath, SVGO_VERSION } = await loadSiteContext();
   const learnContent = await readJSON(
     path.join(__dirname, 'src', 'learn-content.json'),
   );
+  const learnClusters = await readJSON(
+    path.join(__dirname, 'src', 'learn-clusters.json'),
+  );
+  const faqItems = await readJSON(path.join(__dirname, 'src', 'learn-faq.json'));
+  const pluginIds = config.plugins.map((p) => p.id);
+  validateLearnClusters(pluginIds, learnClusters);
+  const pluginClusterMap = buildPluginClusterMap(learnClusters);
+
   const env = nunjucks.configure(path.join(__dirname, 'src'), {
     autoescape: true,
   });
@@ -226,15 +315,36 @@ async function learnHtmlWrite() {
   const featuredPlugins = FEATURED_PLUGIN_IDS.map((id) =>
     plugins.find((p) => p.id === id),
   ).filter(Boolean);
+  const clustersForTemplates = buildClustersForTemplates(
+    learnClusters,
+    plugins,
+    learnContent,
+  );
 
   await Promise.all(
     plugins.map(async (plugin) => {
       const learn = learnContent[plugin.id] || null;
+      const clusterEntry = pluginClusterMap.get(plugin.id);
+      const cluster = clusterEntry
+        ? {
+            slug: clusterEntry.slug,
+            title: clusterEntry.title,
+          }
+        : null;
       const { pageTitle, metaDescription } = buildPluginPageMeta(plugin);
       const canonicalUrl = `${liveBaseUrl}plugins/${plugin.slug}/`;
+      const breadcrumbList = buildBreadcrumbList(liveBaseUrl, [
+        { name: 'SVGOMG.net', url: '/' },
+        { name: 'How to optimize', url: 'how-to-optimize/' },
+        ...(cluster
+          ? [{ name: cluster.title, url: `guides/${cluster.slug}/` }]
+          : []),
+        { name: plugin.name, url: canonicalUrl },
+      ]);
       const htmlContent = env.render('plugins/plugin.html', {
         plugin,
         learn,
+        cluster,
         relatedPlugins: resolveRelatedPlugins(
           plugin.id,
           plugins,
@@ -246,6 +356,11 @@ async function learnHtmlWrite() {
         liveBaseUrl,
         iconPath,
         ogImageUrl: buildOgImageUrl(liveBaseUrl, plugin.slug),
+        breadcrumbList,
+        siteToolbarMode: 'content',
+        siteToolbarActive: 'plugins',
+        showCaution: showPluginCaution(learn),
+        SVGO_VERSION,
       });
       const outDir = path.join(__dirname, 'build', 'plugins', plugin.slug);
       await fs.mkdir(outDir, { recursive: true });
@@ -253,27 +368,104 @@ async function learnHtmlWrite() {
     }),
   );
 
+  const pluginsHubCanonical = `${liveBaseUrl}plugins/`;
   const learnIndexHtml = env.render('plugins/index.html', {
     plugins,
     featuredPlugins,
+    clusters: clustersForTemplates,
     pageTitle: 'SVGO Plugin Guide – SVGOMG',
     metaDescription:
-      'The SVGO Plugin Guide for SVGOMG: what each transform does, when to enable it, and how to avoid broken SVG output.',
-    canonicalUrl: `${liveBaseUrl}plugins/`,
+      'The SVGO Plugin Guide for SVGOMG.net: what each transform does, when to enable it, and how to avoid broken SVG output.',
+    canonicalUrl: pluginsHubCanonical,
     liveBaseUrl,
     iconPath,
     ogImageUrl: buildOgImageUrl(liveBaseUrl, 'index'),
+    breadcrumbList: buildBreadcrumbList(liveBaseUrl, [
+      { name: 'SVGOMG.net', url: '/' },
+      { name: 'SVGO Plugin Guide', url: pluginsHubCanonical },
+    ]),
+    siteToolbarMode: 'content',
+    siteToolbarActive: 'plugins',
+    SVGO_VERSION,
   });
   await fs.mkdir(path.join(__dirname, 'build', 'plugins'), { recursive: true });
   await fs.writeFile(
     path.join(__dirname, 'build', 'plugins', 'index.html'),
     learnIndexHtml,
   );
+
+  const guidePageTitle = 'How to Optimize SVG Files – SVGOMG';
+  const guideMetaDescription =
+    'Step-by-step guide to optimizing SVGs with SVGOMG.net and SVGO: settings, features, troubleshooting, and when to use SVG vs raster formats.';
+  const guideCanonicalUrl = `${liveBaseUrl}how-to-optimize/`;
+  const guideHtml = env.render('how-to-optimize/index.html', {
+    plugins,
+    featuredPlugins,
+    clusters: clustersForTemplates,
+    faqItems,
+    pageTitle: guidePageTitle,
+    metaDescription: guideMetaDescription,
+    canonicalUrl: guideCanonicalUrl,
+    liveBaseUrl,
+    iconPath,
+    ogImageUrl: buildOgImageUrl(liveBaseUrl, 'index'),
+    breadcrumbList: buildBreadcrumbList(liveBaseUrl, [
+      { name: 'SVGOMG.net', url: '/' },
+      { name: 'How to optimize', url: guideCanonicalUrl },
+    ]),
+    siteToolbarMode: 'content',
+    siteToolbarActive: 'guide',
+    SVGO_VERSION,
+  });
+  const guideOutDir = path.join(__dirname, 'build', 'how-to-optimize');
+  await fs.mkdir(guideOutDir, { recursive: true });
+  await fs.writeFile(path.join(guideOutDir, 'index.html'), guideHtml);
+
+  await Promise.all(
+    clustersForTemplates.map(async (cluster) => {
+      const pageTitle = `${cluster.title} – SVG Optimization | SVGOMG`;
+      const canonicalUrl = `${liveBaseUrl}guides/${cluster.slug}/`;
+      const seeAlsoClusters = resolveSeeAlsoClusters(
+        cluster.slug,
+        learnClusters,
+        clustersForTemplates,
+      );
+      const htmlContent = env.render('guides/cluster.html', {
+        cluster,
+        clusterPlugins: cluster.clusterPlugins,
+        seeAlsoClusters,
+        pageTitle,
+        metaDescription: cluster.description,
+        canonicalUrl,
+        liveBaseUrl,
+        iconPath,
+        ogImageUrl: buildOgImageUrl(liveBaseUrl, 'index'),
+        breadcrumbList: buildBreadcrumbList(liveBaseUrl, [
+          { name: 'SVGOMG.net', url: '/' },
+          { name: 'How to optimize', url: 'how-to-optimize/' },
+          { name: cluster.title, url: canonicalUrl },
+        ]),
+        siteToolbarMode: 'content',
+        siteToolbarActive: 'guide',
+        SVGO_VERSION,
+      });
+      const outDir = path.join(__dirname, 'build', 'guides', cluster.slug);
+      await fs.mkdir(outDir, { recursive: true });
+      await fs.writeFile(path.join(outDir, 'index.html'), htmlContent);
+    }),
+  );
 }
 
 function learnHtmlMinify() {
   return gulp
-    .src(['build/plugins/**/*.html'], { base: 'build', allowEmpty: true })
+    .src([
+      'build/plugins/**/*.html',
+      'build/how-to-optimize/**/*.html',
+      'build/guides/**/*.html',
+    ], {
+      base: 'build',
+      allowEmpty: true,
+    })
     .pipe(gulpif(!IS_DEV_TASK, gulpHtmlmin(buildConfig.htmlmin)))
     .pipe(gulp.dest('build'));
 }
@@ -282,9 +474,17 @@ const learnHtml = gulp.series(learnHtmlWrite, learnHtmlMinify);
 
 async function sitemap() {
   const { config, liveBaseUrl } = await loadSiteContext();
+  const learnClusters = await readJSON(
+    path.join(__dirname, 'src', 'learn-clusters.json'),
+  );
+  const clusterUrls = Object.keys(learnClusters).map(
+    (slug) => `${liveBaseUrl}guides/${slug}/`,
+  );
   const urls = [
     liveBaseUrl,
+    `${liveBaseUrl}how-to-optimize/`,
     `${liveBaseUrl}plugins/`,
+    ...clusterUrls,
     ...config.plugins.map((p) => `${liveBaseUrl}plugins/${pluginSlug(p.id)}/`),
   ];
   const lastmod = new Date().toISOString().slice(0, 10);
@@ -376,6 +576,7 @@ function watch() {
       'src/**/*.{html,svg,woff2}',
       'src/*.json',
       'src/plugins/**/*.html',
+      'src/how-to-optimize/**/*.html',
       'src/partials/**/*.html',
     ],
     gulp.parallel(html, learnPages, copy, allJs),

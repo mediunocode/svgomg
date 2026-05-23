@@ -1,0 +1,100 @@
+// Sticky blue header on the tool, homepage guide scroll, and /plugins pages.
+:root {
+  --site-ui-font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --site-toolbar-height: 52px;
+  --toolbar-bg-base: #3f51b5;
+  --toolbar-nav-hover: #{rgba(#fff, 0.08)};
+  --toolbar-nav-active: #{rgba(#fff, 0.2)};
+  --toolbar-nav-active-hover: #{rgba(#fff, 0.3)};
+  --toolbar-nav-muted: #{rgba(#fff, 0.78)};
+  --toolbar-label-muted: #fff;
+  --toolbar-label-hover: #fff;
+  --toolbar-brand-meta: #{rgba(#fff, 0.55)};
+  --toolbar-nav-accent: #4dd0e1;
+  --toolbar-pill-inset-y: 10px;
+  --toolbar-pill-inset-x: 0;
+  --toolbar-pill-radius: 8px;
+}
+
+body.site-with-toolbar {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+body.site-with-toolbar:not(.learn-page) {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+// Pin the tool shell so third-party body children (consent UI, ads) can't
+// shrink .app-output in the flex column.
+body.site-with-toolbar:not(.learn-page) .toolbar-site {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+}
+
+body.site-with-toolbar:not(.learn-page) .toolbar-extra {
+  position: fixed;
+  top: var(--site-toolbar-height);
+  left: 0;
+  right: 0;
+  height: 0;
+  min-height: 0;
+  overflow: visible;
+  z-index: 5;
+}
+
+body.site-with-toolbar:not(.learn-page) .app-output {
+  position: fixed;
+  top: var(--site-toolbar-height);
+  left: 0;
+  right: 0;
+  bottom: var(--mv-adhesion-height);
+  flex: none;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+}
+
+.toolbar-site {
+  flex: none;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  transform: translateZ(0);
+  min-height: var(--site-toolbar-height);
+  max-width: 100%;
+  box-sizing: border-box;
+  isolation: isolate;
+  overflow-x: clip;
+  font-family: var(--site-ui-font-family);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--toolbar-bg-base);
+  background-image: linear-gradient(
+    128deg,
+    #3648a8 0%,
+    #3949ab 28%,
+    #3f51b5 60%,
+    #4a5fc7 100%
+  );
+  box-shadow: 0 10px 24px -6px rgba(#000, 0.55);
+}
+
+body.site-with-toolbar.learn-page {
+  .learn-page-main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .learn-page-inner {
+    flex: 1 1 auto;
+  }
+}
+

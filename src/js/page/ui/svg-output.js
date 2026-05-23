@@ -27,11 +27,39 @@ export default class SvgOutput {
     // I would rather use blob urls, but they don't work in Firefox
     // All the internal refs break.
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1125667
+    this._svgWidth = width;
+    this._svgHeight = height;
     const nextLoad = this._nextLoadPromise();
     this._svgFrame.src = `data:image/svg+xml,${encodeURIComponent(text)}`;
     this._svgFrame.style.width = `${width}px`;
     this._svgFrame.style.height = `${height}px`;
-    return nextLoad;
+    return nextLoad.then(() => this._applyInitialScaleIfDefault());
+  }
+
+  _applyInitialScaleIfDefault() {
+    return domReady.then(() => {
+      if (!this._panZoom?.isAtDefaultTransform()) return;
+
+      const apply = () => {
+        const { width: containerWidth, height: containerHeight } =
+          this.container.getBoundingClientRect();
+
+        if (containerWidth < 1 || containerHeight < 1) {
+          requestAnimationFrame(apply);
+          return;
+        }
+
+        this._panZoom.fitCentered({
+          containerWidth,
+          containerHeight,
+          contentWidth: this._svgWidth,
+          contentHeight: this._svgHeight,
+          maxScale: 1.5,
+        });
+      };
+
+      requestAnimationFrame(apply);
+    });
   }
 
   reset() {

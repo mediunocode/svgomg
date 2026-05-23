@@ -13,11 +13,11 @@
     <meta property="og:description" content="{{ metaDescription }}">
     <meta property="og:url" content="{{ canonicalUrl }}">
     {% include "partials/seo/social-image.html" %}
-    <meta property="og:type" content="article">
     <link rel="canonical" href="{{ canonicalUrl }}">
     <link rel="icon" href="/imgs/icon.png">
     <link rel="apple-touch-icon" href="/imgs/icon.png">
-    {% include "partials/seo/json-ld-article.html" %}
+    {% include "partials/seo/json-ld-website.html" %}
+    {% include "partials/seo/json-ld-cluster.html" %}
     {% include "partials/seo/json-ld-breadcrumb.html" %}
     <link rel="stylesheet" href="/all.css">
   </head>
@@ -25,7 +25,7 @@
     {% include "partials/site-toolbar.html" %}
     <main class="learn-page-main">
       <div class="learn-page-inner mv-content">
-        {% include "partials/learn-plugin-body.html" %}
+        {% include "partials/learn-cluster-body.html" %}
       </div>
     </main>
   </body>

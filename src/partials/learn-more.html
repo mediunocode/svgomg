@@ -1,15 +1,19 @@
-<section class="learn-more" id="how-to-optimize" aria-labelledby="how-to-optimize-heading">
+<section class="learn-more" aria-labelledby="how-to-optimize-heading">
   <div class="learn-more-inner mv-content">
     <header class="learn-more-header">
-      <p class="learn-more-back">
-        <a href="#" class="tool-link">
-          {% include "partials/icons/arrow-up.svg" %}
-          <span>Back to SVGOMG</span>
-        </a>
+      <p class="learn-page-breadcrumb">
+        <a href="/">SVGOMG.net</a>
+        <span aria-hidden="true"> / </span>
+        <span>How to optimize</span>
       </p>
-      <h2 id="how-to-optimize-heading">How to optimize SVG files</h2>
+      <h1 id="how-to-optimize-heading">How to optimize SVG files</h1>
       <p>
-        SVGOMG is a free browser-based GUI for
+        The <a href="/">SVGOMG.net</a> optimizer builds upon
+        <a href="https://github.com/jakearchibald/svgomg" rel="noopener noreferrer">SVGOMG</a>
+        by Jake Archibald.
+      </p>
+      <p>
+        SVGOMG.net is a free browser-based GUI for
         <a href="https://github.com/svg/svgo">SVGO</a>, the industry-standard SVG
         optimizer. Upload an SVG, tune the settings on the right, and download a
         smaller file — usually in seconds, with no server upload required.
@@ -35,7 +39,7 @@
     <section>
       <h3>Quick start</h3>
       <ol>
-        <li>Open the menu and choose <strong>Open SVG</strong>, paste markup, or try the demo.</li>
+        <li>Use the toolbar to <strong>Open SVG</strong>, paste markup, or try the demo.</li>
         <li>Compare the optimized preview against the original (toggle <strong>Show original</strong>).</li>
         <li>Adjust precision sliders if you need tighter or looser path rounding.</li>
         <li>Download the result or copy the markup from the Markup tab.</li>
@@ -93,6 +97,21 @@
     </section>
 
     <section>
+      <h3>Optimization topics</h3>
+      <p>
+        Browse topic guides that group related SVGO plugins — useful when you want
+        to understand metadata cleanup, path rounding, or troubleshooting breaks:
+      </p>
+      <ul class="learn-page-topic-list">
+        {% for cluster in clusters %}
+          <li>
+            <a href="/guides/{{ cluster.slug }}/"><strong>{{ cluster.title }}</strong></a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section>
       <h3>When optimization breaks your SVG</h3>
       <p>
         SVGO is aggressive by design. Common gotchas: animations that rely on
@@ -104,7 +123,8 @@
         If something looks off, enable <strong>Show original</strong>, then
         disable plugins in groups (metadata cleanup, path rounding, ID cleanup)
         until the preview matches again. The last group you disabled contains
-        the plugin that caused the regression.
+        the plugin that caused the regression. Start with the
+        <a href="/guides/high-risk-transforms/">high-risk transforms</a> topic guide.
       </p>
     </section>
 
@@ -122,15 +142,16 @@
     <section>
       <h3>SVGO Plugin Guide</h3>
       <p>
-        Every feature toggle in SVGOMG maps to an SVGO plugin. We publish a
+        Every feature toggle on SVGOMG.net maps to an SVGO plugin. We publish a
         dedicated guide for each one with enable/disable advice and troubleshooting:
       </p>
       <ul>
-        <li><a href="/plugins/remove-view-box/">Remove viewBox</a></li>
-        <li><a href="/plugins/cleanup-ids/">Clean up IDs</a></li>
-        <li><a href="/plugins/convert-path-data/">Round/rewrite paths</a></li>
-        <li><a href="/plugins/remove-metadata/">Remove &lt;metadata&gt;</a></li>
-        <li><a href="/plugins/merge-paths/">Merge paths</a></li>
+        {% for plugin in featuredPlugins %}
+          <li>
+            <a href="/plugins/{{ plugin.slug }}/">{{ plugin.name }}</a>
+            (<code>{{ plugin.id }}</code>)
+          </li>
+        {% endfor %}
       </ul>
       <p><a href="/plugins/">Browse the SVGO Plugin Guide</a> ({{ plugins | length }} plugins)</p>
     </section>
@@ -145,14 +166,14 @@
         </dd>
         <dt>Can I use the output commercially?</dt>
         <dd>
-          SVGOMG does not change licensing of your artwork. Optimized output is
+          SVGOMG.net does not change licensing of your artwork. Optimized output is
           still your SVG — check your source asset license as usual.
         </dd>
         <dt>What is SVGO?</dt>
         <dd>
           <a href="https://github.com/svg/svgo">SVGO</a> (SVG Optimizer) is an
           open-source Node.js library that applies dozens of structural and
-          syntactic transforms to shrink SVG files. SVGOMG exposes those options
+          syntactic transforms to shrink SVG files. SVGOMG.net exposes those options
           visually.
         </dd>
         <dt>How much smaller will my file get?</dt>

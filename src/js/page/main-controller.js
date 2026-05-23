@@ -3,7 +3,14 @@ import Svgo from './svgo.js';
 import { domReady } from './utils.js';
 import Output from './ui/output.js';
 import DownloadButton from './ui/download-button.js';
+import DownloadPngButton from './ui/download-png-button.js';
 import CopyButton from './ui/copy-button.js';
+import {
+  SvgToPngError,
+  downloadBlob,
+  pngFilenameFromSvg,
+  svgToPng,
+} from './svg-to-png.js';
 import BgFillButton from './ui/bg-fill-button.js';
 import Results from './ui/results.js';
 import Settings from './ui/settings.js';
@@ -25,6 +32,7 @@ export default class MainController {
     this._mainUi = null;
     this._outputUi = new Output();
     this._downloadButtonUi = new DownloadButton();
+    this._downloadPngButtonUi = new DownloadPngButton();
     this._copyButtonUi = new CopyButton();
     this._resultsUi = new Results();
     this._settingsUi = new Settings();
@@ -37,7 +45,7 @@ export default class MainController {
     const changelogUi = new Changelog(self.version);
     // _resultsContainerUi is unused
     this._resultsContainerUi = new ResultsContainer(this._resultsUi);
-    const viewTogglerUi = new ViewToggler();
+    this._viewTogglerUi = new ViewToggler();
 
     // ui events
     this._settingsUi.emitter.on('change', () => this._onSettingsChange());
@@ -51,7 +59,7 @@ export default class MainController {
     this._mainMenuUi.emitter.on('error', ({ error }) =>
       this._handleError(error),
     );
-    viewTogglerUi.emitter.on('change', (event) =>
+    this._viewTogglerUi.emitter.on('change', (event) =>
       this._outputUi.set(event.value),
     );
     window.addEventListener('keydown', (event) => this._onGlobalKeyDown(event));
@@ -60,6 +68,7 @@ export default class MainController {
 
     // state
     this._inputItem = null;
+    this._currentOutputFile = null;
     this._cache = new ResultsCache(10);
     this._latestCompressJobId = 0;
     this._userHasInteracted = false;
@@ -98,44 +107,56 @@ export default class MainController {
       const minorActionContainer = container.querySelector(
         '.minor-action-container',
       );
-      const toolbarElement = container.querySelector('.toolbar');
       const outputElement = container.querySelector('.output');
-      const menuExtraElement = container.querySelector('.menu-extra');
+      const toolbarExtraElement = document.querySelector('.toolbar-extra');
 
       // elements for intro anim
       this._mainUi = new MainUi(
-        toolbarElement,
         actionContainer,
         this._outputUi.container,
         this._settingsUi.container,
       );
 
+      this._downloadPngButtonUi.setHandler(() => this._onDownloadPng());
+
       minorActionContainer.append(
         bgFillUi.container,
         this._copyButtonUi.container,
+        this._downloadPngButtonUi.container,
       );
       actionContainer.append(this._downloadButtonUi.container);
       outputElement.append(this._outputUi.container);
       container.append(this._toastsUi.container, dropUi.container);
-      menuExtraElement.append(changelogUi.container);
+      toolbarExtraElement?.append(changelogUi.container);
 
-      // load previous settings
-      this._loadSettings();
+      // load previous settings, then show the demo SVG by default
+      this._loadSettings().then(() => {
+        let pendingData = null;
+        let pendingName = null;
+        try {
+          pendingData = sessionStorage.getItem('pending-svg-data');
+          pendingName = sessionStorage.getItem('pending-svg-name');
+          if (pendingData) {
+            sessionStorage.removeItem('pending-svg-data');
+            sessionStorage.removeItem('pending-svg-name');
+          }
+        } catch {
+          // sessionStorage unavailable; fall through to demo
+        }
+
+        if (pendingData) {
+          this._mainMenuUi.emitter.emit('svgDataLoad', {
+            data: pendingData,
+            filename: pendingName || 'image.svg',
+          });
+        } else {
+          this._mainMenuUi.loadDemo({ auto: true });
+        }
+      });
 
       // someone managed to hit the preloader, aww
       if (preloaderUi.activated) {
         this._toastsUi.show('Ready now!', { duration: 3000 });
-      }
-
-      // for testing
-      // eslint-disable-next-line no-constant-condition
-      if (false) {
-        (async () => {
-          const data = await fetch('test-svgs/car-lite.svg').then((response) =>
-            response.text(),
-          );
-          this._onInputChange({ data, filename: 'car-lite.svg' });
-        })();
       }
     });
   }
@@ -145,8 +166,6 @@ export default class MainController {
       event.preventDefault();
       this._mainMenuUi.showFilePicker();
     }
-
-    if (event.key === 'Escape') this._mainMenuUi.hide();
   }
 
   _onGlobalPaste(event) {
@@ -231,7 +250,7 @@ export default class MainController {
     }
   }
 
-  async _onInputChange({ data, filename }) {
+  async _onInputChange({ data, filename, fromDemo }) {
     const settings = this._settingsUi.getSettings();
     this._userHasInteracted = true;
 
@@ -249,8 +268,13 @@ export default class MainController {
     this._compressSvg(settings);
     this._outputUi.reset();
     this._mainUi.activate();
-    this._mainMenuUi.allowHide = true;
-    this._mainMenuUi.hide();
+    this._viewTogglerUi.show();
+    this._viewTogglerUi.selectImage();
+    if (fromDemo) {
+      this._mainMenuUi.blurDemoButton();
+    }
+
+    this._mainMenuUi.stopSpinner();
   }
 
   _handleError(error) {
@@ -318,6 +342,8 @@ export default class MainController {
   }
 
   async _updateForFile(svgFile, { compareToFile, compress }) {
+    this._currentOutputFile = svgFile;
+    this._downloadPngButtonUi.setEnabled(true);
     this._outputUi.update(svgFile);
     this._downloadButtonUi.setDownload(this._inputFilename, svgFile);
     this._copyButtonUi.setCopyText(svgFile.text);
@@ -326,5 +352,37 @@ export default class MainController {
       comparisonSize: compareToFile && (await compareToFile.size({ compress })),
       size: await svgFile.size({ compress }),
     });
+  }
+
+  async _onDownloadPng() {
+    if (!this._currentOutputFile) {
+      this._toastsUi.show('Load an SVG first', { duration: 2000 });
+      return;
+    }
+
+    this._downloadPngButtonUi.working();
+
+    try {
+      const { blob, usedFallback } = await svgToPng(
+        this._currentOutputFile.text,
+        this._currentOutputFile.width,
+        this._currentOutputFile.height,
+      );
+
+      if (usedFallback) {
+        this._toastsUi.show(
+          'PNG size estimated — SVG had no width, height, or viewBox',
+          { duration: 3000 },
+        );
+      }
+
+      downloadBlob(blob, pngFilenameFromSvg(this._inputFilename));
+    } catch (error) {
+      const message =
+        error instanceof SvgToPngError ? error.message : 'PNG export failed.';
+      this._toastsUi.show(message, { isError: true });
+    } finally {
+      this._downloadPngButtonUi.done();
+    }
   }
 }

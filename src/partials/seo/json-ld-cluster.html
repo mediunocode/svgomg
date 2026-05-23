@@ -1,0 +1,33 @@
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{{ cluster.title|e }}",
+  "description": "{{ metaDescription|e }}",
+  "image": "{{ ogImageUrl|e }}",
+  "url": "{{ canonicalUrl|e }}",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {% for item in clusterPlugins %}
+      {
+        "@type": "ListItem",
+        "position": {{ loop.index }},
+        "url": "{{ liveBaseUrl }}plugins/{{ item.plugin.slug }}/",
+        "name": "{{ item.plugin.name|e }}"
+      }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+}
+</script>

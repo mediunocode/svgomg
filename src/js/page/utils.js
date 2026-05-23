@@ -73,44 +73,6 @@ function transitionClassFunc({ removeClass = false } = {}) {
 export const transitionToClass = transitionClassFunc();
 export const transitionFromClass = transitionClassFunc({ removeClass: true });
 
-const hasLoadedSvg = () =>
-  document.querySelector('.action-button-container')?.classList.contains('active');
-
-export function scrollToGuide() {
-  const toolHeight = document.querySelector('.app-output').offsetHeight;
-  window.scrollTo({ top: toolHeight, behavior: 'smooth' });
-  history.pushState(null, '', '#how-to-optimize');
-}
-
-export function scrollToTool() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  history.pushState(null, '', location.pathname + location.search);
-
-  if (!hasLoadedSvg()) {
-    restoreWelcomeMainMenu();
-  }
-}
-
-export function dismissMainMenu() {
-  const mainMenu = document.querySelector('.main-menu');
-  if (mainMenu.classList.contains('hidden')) return;
-
-  mainMenu.querySelector('.overlay').classList.add('hidden');
-  mainMenu.querySelector('.menu').classList.add('hidden');
-
-  // Before an SVG is loaded the drawer stays part of the welcome layout.
-  if (hasLoadedSvg()) {
-    mainMenu.classList.add('hidden');
-  }
-}
-
-function restoreWelcomeMainMenu() {
-  const mainMenu = document.querySelector('.main-menu');
-  mainMenu.classList.remove('hidden');
-  mainMenu.querySelector('.menu').classList.remove('hidden');
-  mainMenu.querySelector('.overlay').classList.remove('hidden');
-}
-
 export function trackFocusMethod() {
   let focusMethod = 'mouse';
 

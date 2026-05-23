@@ -8,19 +8,27 @@
   "url": "{{ canonicalUrl|e }}",
   "author": {
     "@type": "Organization",
-    "name": "SVGOMG"
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "SVGOMG"
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}"
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
     "@id": "{{ canonicalUrl|e }}"
   },
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}"
+  },
   "about": {
     "@type": "SoftwareApplication",
-    "name": "SVGO",
+    "name": "SVGOMG.net",
+    "url": "{{ liveBaseUrl|e }}",
     "applicationCategory": "DeveloperApplication"
   }
 }

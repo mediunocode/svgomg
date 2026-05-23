@@ -1,0 +1,44 @@
+    <header class="learn-page-article-header">
+      <p class="learn-page-breadcrumb">
+        <a href="/">SVGOMG.net</a>
+        <span aria-hidden="true"> / </span>
+        <a href="/how-to-optimize/">How to optimize</a>
+      </p>
+      <h1>{{ cluster.title }}</h1>
+      <p class="learn-page-lead">{{ cluster.intro }}</p>
+    </header>
+
+    <section>
+      <h2>SVGO plugins in this topic</h2>
+      <ul class="learn-page-cluster-list">
+        {% for item in clusterPlugins %}
+          <li>
+            <a href="/plugins/{{ item.plugin.slug }}/"><strong>{{ item.plugin.name }}</strong></a>
+            <span class="learn-page-plugin-id"><code>{{ item.plugin.id }}</code></span>
+            {% if item.summary %}
+              <p class="learn-page-cluster-summary">{{ item.summary }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    {% if seeAlsoClusters | length %}
+      <section>
+        <h2>Related topics</h2>
+        <ul>
+          {% for related in seeAlsoClusters %}
+            <li>
+              <a href="/guides/{{ related.slug }}/">{{ related.title }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
+
+    <section>
+      <h2>Try it</h2>
+      <p>
+        Open SVGOMG.net, load your SVG, and toggle the plugins above in the Features panel.
+      </p>
+    </section>

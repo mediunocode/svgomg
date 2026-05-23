@@ -24,6 +24,9 @@
 /plugins/*
   Cache-Control: public, max-age=60, stale-while-revalidate=86400
 
+/guides/*
+  Cache-Control: public, max-age=60, stale-while-revalidate=86400
+
 /sitemap.xml
   Cache-Control: public, max-age=3600
 

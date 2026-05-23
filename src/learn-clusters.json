@@ -1,0 +1,110 @@
+{
+  "metadata-and-editor-cruft": {
+    "title": "Remove metadata and editor noise",
+    "description": "Strip doctype, XML prolog, comments, metadata, and editor-specific attributes from SVG exports for smaller web-ready files.",
+    "intro": "Design-tool exports often ship with doctype declarations, XML processing instructions, comments, and metadata blocks that browsers never use. These transforms are among the safest byte savings in SVGO and are enabled by default on SVGOMG.net for most production assets.",
+    "pluginIds": [
+      "removeDoctype",
+      "removeXMLProcInst",
+      "removeComments",
+      "removeMetadata",
+      "removeEditorsNSData",
+      "removeTitle",
+      "removeDesc"
+    ],
+    "seeAlsoClusterSlugs": ["attributes-and-namespaces"]
+  },
+  "paths-and-geometry": {
+    "title": "Path and shape optimization",
+    "description": "Round path data, merge shapes, collapse groups, and remove off-canvas geometry to shrink complex Illustrator and Figma exports.",
+    "intro": "Path-heavy SVGs benefit from coordinate rounding, shape conversion, and group flattening. These plugins deliver the biggest size wins on complex illustrations but deserve a visual check after enabling — especially convertPathData and mergePaths.",
+    "pluginIds": [
+      "convertPathData",
+      "mergePaths",
+      "convertShapeToPath",
+      "convertEllipseToCircle",
+      "convertTransform",
+      "collapseGroups",
+      "moveElemsAttrsToGroup",
+      "moveGroupAttrsToElems",
+      "removeOffCanvasPaths"
+    ],
+    "seeAlsoClusterSlugs": ["responsive-sizing", "high-risk-transforms"]
+  },
+  "ids-defs-and-references": {
+    "title": "IDs, defs, and references",
+    "description": "Clean up ids, defs, gradients, and url(#…) references so unused definitions and duplicate IDs do not bloat your SVG.",
+    "intro": "Illustrator and Sketch exports often include long random IDs, duplicate definitions, and unused symbols. Cleaning these up is essential for icon sets and any SVG that uses masks, clips, or gradients referenced by id.",
+    "pluginIds": [
+      "removeUselessDefs",
+      "cleanupListOfValues",
+      "reusePaths",
+      "sortDefsChildren"
+    ],
+    "seeAlsoClusterSlugs": ["high-risk-transforms", "hidden-and-unused-content"]
+  },
+  "styles-and-presentation": {
+    "title": "Styles and CSS in SVG",
+    "description": "Merge, inline, and minify internal styles, or remove style blocks once rules are flattened onto elements.",
+    "intro": "SVGs exported with class-based CSS can be flattened into presentational attributes for portability. Run style plugins in the right order — merge before inline — and compare the preview when toggling convertStyleToAttrs.",
+    "pluginIds": [
+      "mergeStyles",
+      "inlineStyles",
+      "minifyStyles",
+      "convertStyleToAttrs",
+      "removeStyleElement"
+    ],
+    "seeAlsoClusterSlugs": ["attributes-and-namespaces"]
+  },
+  "responsive-sizing": {
+    "title": "Responsive SVG sizing",
+    "description": "Use viewBox and CSS-friendly dimensions: remove fixed width/height, round numeric values, and avoid breaking scalable icons.",
+    "intro": "Responsive icons and illustrations should scale with CSS. These plugins adjust numeric precision and strip redundant width/height when a viewBox is present. Always confirm layout after changing sizing-related options.",
+    "pluginIds": [
+      "removeDimensions",
+      "cleanupNumericValues"
+    ],
+    "seeAlsoClusterSlugs": ["high-risk-transforms", "paths-and-geometry"]
+  },
+  "hidden-and-unused-content": {
+    "title": "Hidden and unused markup",
+    "description": "Remove hidden layers, empty containers, empty text nodes, and redundant stroke/fill attributes from design-tool exports.",
+    "intro": "Hidden layers and empty groups are common in Figma, Sketch, and Illustrator exports. Removing them is usually safe for static icons and UI graphics, but disable the group if your SVG relies on hidden elements for animation or interaction.",
+    "pluginIds": [
+      "removeHiddenElems",
+      "removeEmptyContainers",
+      "removeEmptyText",
+      "removeUselessStrokeAndFill"
+    ],
+    "seeAlsoClusterSlugs": ["ids-defs-and-references"]
+  },
+  "attributes-and-namespaces": {
+    "title": "Attributes and namespaces",
+    "description": "Normalize attributes, remove redundant namespaces, sort attributes, and drop unknown or default values.",
+    "intro": "These transforms trim attribute noise without changing the visible graphic. They are safe defaults for most web SVGs. Turn off removeXMLNS or removeUnusedNS only when your asset uses unusual namespace setups.",
+    "pluginIds": [
+      "cleanupAttrs",
+      "removeXMLNS",
+      "removeUnusedNS",
+      "removeUnknownsAndDefaults",
+      "removeNonInheritableGroupAttrs",
+      "removeEmptyAttrs",
+      "sortAttrs",
+      "cleanupEnableBackground",
+      "convertColors"
+    ],
+    "seeAlsoClusterSlugs": ["metadata-and-editor-cruft"]
+  },
+  "high-risk-transforms": {
+    "title": "Transforms that can break SVGs",
+    "description": "SVGO plugins that often cause layout, scaling, or embedded-content regressions — disable first when output looks wrong.",
+    "intro": "When optimization breaks your SVG, start here. These plugins remove viewBox, embedded rasters, scripts, or rewrite IDs in ways that break responsive layouts, animations, or references. Disable them first, then re-enable related plugins one at a time.",
+    "pluginIds": [
+      "removeViewBox",
+      "removeRasterImages",
+      "removeScripts",
+      "cleanupIds"
+    ],
+    "seeAlsoClusterSlugs": ["responsive-sizing", "paths-and-geometry"]
+  }
+}
