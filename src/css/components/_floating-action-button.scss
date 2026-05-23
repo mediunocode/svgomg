@@ -92,9 +92,9 @@
 
   &-label {
     position: absolute;
-    right: calc(100% + 0.65rem);
-    top: 50%;
-    transform: translateY(-50%);
+    bottom: calc(100% + 0.65rem);
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -107,5 +107,15 @@
 
   .floating-action-button--png-download {
     flex-shrink: 0;
+  }
+
+  @media (min-width: 640px) {
+    &-label {
+      bottom: auto;
+      left: auto;
+      right: calc(100% + 0.65rem);
+      top: 50%;
+      transform: translateY(-50%);
+    }
   }
 }
